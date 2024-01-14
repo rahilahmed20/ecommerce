@@ -1,0 +1,26 @@
+1. forget password screen
+
+
+
+
+6. notification feature
+7. login till end (user should not login every time, he will open app)
+8. color palette
+9. modify Snack bar
+10. messaging feature
+11. koi bhi email address se login ho jaa ra hai. It should be done only with valid email id.
+12. female login karegi toh bhi profile pey male ka photo default aaraha h.
+13. back button dabane par. appliication close ho jaa rha but pichley page pey jaana chahiye.
+14. profile image and name is not changing
+15. change password option
+16. address update hone ke baad placeholder mein dikhna chahiye
+17. history nhi chalra
+18. help nhi chalra
+19. logout mein ek modal aana chahiye. are you sure?
+20. map the ambiguous errors with user friendly error.
+21. login as a buyer likh ke aaraha h
+22. ye points sab kharab karra h. dollar mein decimal chalta hai, rupee mein nhi accha lagta
+23. koi bhi banda as a vendor login karke kuch bhi upload karne laga toh
+24. vendor side UI aur logic ki lagi padi h
+25. payment ka option add karna h
+

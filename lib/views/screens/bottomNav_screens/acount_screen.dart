@@ -2,13 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
+
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:macstore/controllers/change_password_screen.dart';
 import 'package:macstore/provider/favorite_provider.dart';
 import 'package:macstore/provider/product_provider.dart';
 import 'package:macstore/views/screens/authentication_screens/login_screen.dart';
@@ -51,7 +53,7 @@ class _EditProfilePopupState extends State<EditProfilePopup> {
 
   _uploadProfileImageToStorage(Uint8List? image) async {
     Reference ref =
-    _storage.ref().child('profilePics').child(_auth.currentUser!.uid);
+        _storage.ref().child('profilePics').child(_auth.currentUser!.uid);
 
     UploadTask uploadTask = ref.putData(image!);
 
@@ -152,7 +154,7 @@ class _EditProfilePopupState extends State<EditProfilePopup> {
 
             // Create a reference to the user's document in Firestore
             DocumentReference userRef =
-            FirebaseFirestore.instance.collection('buyers').doc(userId);
+                FirebaseFirestore.instance.collection('buyers').doc(userId);
 
             // Update the user's data in Firestore
 
@@ -171,15 +173,15 @@ class _EditProfilePopupState extends State<EditProfilePopup> {
           },
           child: _isLoading
               ? CircleAvatar(
-            child: CircularProgressIndicator(),
-          )
+                  child: CircularProgressIndicator(),
+                )
               : Text(
-            "Save",
-            style: GoogleFonts.roboto(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+                  "Save",
+                  style: GoogleFonts.roboto(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
       ],
     );
@@ -227,7 +229,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   void _setupUserDataStream() {
     // Create a stream of the user data
     Stream<DocumentSnapshot> userDataStream =
-    _firestore.collection('buyers').doc(_auth.currentUser!.uid).snapshots();
+        _firestore.collection('buyers').doc(_auth.currentUser!.uid).snapshots();
 
     // Listen to the stream and update the UI when there's a change
     userDataStream.listen((DocumentSnapshot userData) {
@@ -261,7 +263,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     });
   }
 
-  //retrive orders
+  //retrieve orders
 
   String capitalizeFirstLetter(String text) {
     if (text.isEmpty) {
@@ -294,8 +296,8 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
       await _auth.signOut().whenComplete(() async {
         var sharedPref = await SharedPreferences.getInstance();
         sharedPref.setBool(SplashScreenState.KEYLOGIN, false);
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) {
           return LoginScreen();
         }));
       });
@@ -323,11 +325,8 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                       alignment: Alignment.center,
                       child: CachedNetworkImage(
                         imageUrl:
-                        "https://firebasestorage.googleapis.com/v0/b/codeless-app.appspot.com/o/FBrbGWQJqIbpA5ZHEpajYAEh1V93%2Fuploads%2Fimages%2F78dbff80_1dfe_1db2_8fe9_13f5839e17c1_bg2.png?alt=media",
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width,
+                            "https://firebasestorage.googleapis.com/v0/b/codeless-app.appspot.com/o/FBrbGWQJqIbpA5ZHEpajYAEh1V93%2Fuploads%2Fimages%2F78dbff80_1dfe_1db2_8fe9_13f5839e17c1_bg2.png?alt=media",
+                        width: MediaQuery.of(context).size.width,
                         height: 451,
                         fit: BoxFit.cover,
                       )),
@@ -360,25 +359,25 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                         alignment: Alignment(0, -0.53),
                         child: profileImage == ""
                             ? GestureDetector(
-                            onTap: () {
-                              _showUpdateProfileDialog();
-                            },
-                            child: CircleAvatar(
-                              radius: 65,
-                              backgroundImage: NetworkImage(
-                                'https://cdn.pixabay.com/photo/2014/04/03/10/32/businessman-310819_1280.png',
-                              ),
-                            ))
+                                onTap: () {
+                                  _showUpdateProfileDialog();
+                                },
+                                child: CircleAvatar(
+                                  radius: 65,
+                                  backgroundImage: NetworkImage(
+                                    'https://cdn.pixabay.com/photo/2014/04/03/10/32/businessman-310819_1280.png',
+                                  ),
+                                ))
                             : GestureDetector(
-                            onTap: () {
-                              _showUpdateProfileDialog();
-                            },
-                            child: CircleAvatar(
-                              radius: 65,
-                              backgroundImage: NetworkImage(
-                                profileImage,
-                              ),
-                            )),
+                                onTap: () {
+                                  _showUpdateProfileDialog();
+                                },
+                                child: CircleAvatar(
+                                  radius: 65,
+                                  backgroundImage: NetworkImage(
+                                    profileImage,
+                                  ),
+                                )),
                       ),
                       Align(
                         alignment: Alignment(0.23, -0.61),
@@ -415,8 +414,8 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                       onTap: () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
-                              return ShippingAddressScreen();
-                            }));
+                          return ShippingAddressScreen();
+                        }));
                       },
                       child: Text(
                         city.isEmpty ? 'enter City' : city,
@@ -631,6 +630,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 ],
               ),
             ),
+            SizedBox(
+              height: 10,
+            ),
             ListTile(
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -661,6 +663,34 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               height: 10,
             ),
             ListTile(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return ChangePasswordScreen();
+                }));
+              },
+              leading: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Color(0xffF4F7FC),
+                  ),
+                  child: Image.asset(
+                    'assets/icons/reset_password.png',
+                    color: Color(0xff223150),
+                    scale: 15,
+                  )),
+              title: Text(
+                'Reset Password ',
+                style: GoogleFonts.lato(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ListTile(
               leading: Image.asset('assets/icons/help.png'),
               title: Text(
                 'Help ',
@@ -673,7 +703,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               height: 10,
             ),
             ListTile(
-              onTap: (){
+              onTap: () {
                 _showLogoutConfirmationDialog();
               },
               leading: Image.asset('assets/icons/logout.png'),
@@ -684,6 +714,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 ),
               ),
             ),
+            SizedBox(height: 15)
           ],
         ),
       ),

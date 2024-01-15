@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> pages = [
     HomeScreen(),
     FavoriteScreen(),
-    StoresScreen(),
+    // StoresScreen(),
     CartScreenProduct(),
     AccountScreen(),
   ];
@@ -52,13 +52,13 @@ class _MainScreenState extends State<MainScreen> {
             ),
             label: 'Favorite',
           ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/mart.png',
-              width: 25,
-            ),
-            label: 'Stores',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Image.asset(
+          //     'assets/icons/mart.png',
+          //     width: 25,
+          //   ),
+          //   label: 'Stores',
+          // ),
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/cart.png',

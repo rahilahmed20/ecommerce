@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:macstore/views/screens/authentication_screens/login_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
 
 class AuthController extends GetxController {
@@ -117,5 +117,34 @@ class AuthController extends GetxController {
     }
 
     return res;
+  }
+
+  Future<bool> changePassword(BuildContext context, String password) async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        await currentUser.updatePassword(password);
+
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => MainScreen()));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Password Changed'),
+          backgroundColor: Colors.blue,
+        ));
+        print('password Changed');
+        return true;
+      } else {
+        // Handle the case where the user is not authenticated
+        print('User is not authenticated');
+        return false;
+      }
+    } on FirebaseAuthException catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(error.code.toString()),
+        backgroundColor: Colors.blue,
+      ));
+      print(error.code.toString());
+      return false;
+    }
   }
 }

@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:macstore/controllers/auth_controller.dart';
 import 'package:macstore/controllers/banners_controller.dart';
 import 'package:macstore/controllers/category_controller.dart';
-import 'package:macstore/views/screens/authentication_screens/login_screen.dart';
+// import 'package:macstore/views/screens/authentication_screens/login_screen.dart';
 import 'package:macstore/views/screens/splash_screen.dart';
 
 void main() async {

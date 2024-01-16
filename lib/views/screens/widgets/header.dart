@@ -7,7 +7,8 @@ class HeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.20,
+      height: MediaQuery.of(context).size.height * 0.155,
+      // height: MediaQuery.of(context).size.height * 0.20,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(),
       child: Stack(

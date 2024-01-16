@@ -5,8 +5,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:macstore/provider/product_provider.dart';
-import 'package:macstore/views/screens/inner_screen/checkout_screen.dart';
+// import 'package:macstore/views/screens/inner_screen/checkout_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CartScreenProduct extends ConsumerStatefulWidget {
   const CartScreenProduct({Key? key});
@@ -16,6 +17,19 @@ class CartScreenProduct extends ConsumerStatefulWidget {
 }
 
 class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
+  Razorpay _razorpay = new Razorpay();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _razorpay = new Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+// final totalAmount = ref.read(cartProvider.notifier).calculateTotalAmount();
   @override
   Widget build(BuildContext context) {
     final _cartProvider = ref.read(cartProvider.notifier);
@@ -214,7 +228,7 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                                               ),
                                             ),
                                             Text(
-                                              cartItem.productPrice
+                                              cartItem.discount
                                                   .toStringAsFixed(2),
                                               style: TextStyle(
                                                 fontSize: 18,
@@ -319,21 +333,21 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
               ),
             ),
             const Align(
-              alignment: Alignment(-0.8, -0.05),
+              alignment: Alignment(-0.63, -0.26),
               child: Text(
                 'Subtotal ',
                 style: TextStyle(
                   color: Color(0xFFA1A1A1),
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                   fontFamily: 'Roboto',
                 ),
               ),
             ),
             Align(
-              alignment: Alignment(-0.3, -0.05),
+              alignment: Alignment(-0.19, -0.31),
               child: Text(
-                '\₹' + totalAmount.toStringAsFixed(2),
+                'Rs' + totalAmount.toStringAsFixed(2),
                 style: TextStyle(
                   color: Color(0xFFFF6464),
                   fontSize: 24,
@@ -343,19 +357,19 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
               ),
             ),
             Align(
-              alignment: const Alignment(0.9, -0.05),
+              alignment: const Alignment(0.83, -1),
               child: InkWell(
-                onTap: totalAmount == 0.0
-                    ? null
-                    : () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return CheckoutScreen();
-                        }));
-                      },
+                // onTap: totalAmount == 0.0
+                //     ? null
+                //     : () {
+                //         Navigator.push(context,
+                //             MaterialPageRoute(builder: (context) {
+                //           return CartScreenProduct();
+                //         }));
+                //       },
                 child: Container(
-                  width: 160,
-                  height: 60,
+                  width: 166,
+                  height: 71,
                   clipBehavior: Clip.hardEdge,
                   decoration: BoxDecoration(
                     color: totalAmount == 0.0 ? Colors.grey : Color(0xFF1532E7),
@@ -364,15 +378,21 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text(
-                          'Checkout',
-                          style: GoogleFonts.getFont(
-                            'Roboto',
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                        Container(
+                            child: ElevatedButton(
+                          onPressed: () {
+                            payNowMethod(totalAmount);
+                          },
+                          child: Text(
+                            'Checkout',
+                            style: GoogleFonts.getFont(
+                              'Roboto',
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
+                        )),
                         Icon(
                           Icons.arrow_forward_ios,
                           color: Colors.white,
@@ -387,5 +407,42 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
         ),
       ),
     );
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    // Do something when payment succeeds
+    // Here we get razorpay_payment_id razorpay_order_id razorpay_signature
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet is selected
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _razorpay.clear();
+  }
+
+  payNowMethod(double totalAmount) {
+    var options = {
+      'key': "rzp_test_fCBSWTYONMP298",
+      'amount': (totalAmount * 100).toInt(),
+      'name': 'Ghar Ka Bazar',
+      'order_id': "",
+      'prefill': {
+        'contact': '9372952412',
+        'email': 'shaikhwasiullah500@gmail.com'
+      },
+      'external': {
+        'wallets': ['paytm'] // optional, for adding support for wallets
+      }
+    };
+    _razorpay.open(options);
   }
 }

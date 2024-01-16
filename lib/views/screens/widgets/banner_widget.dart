@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,13 +11,12 @@ class BannerArea extends StatelessWidget {
   Widget build(BuildContext context) {
     final BannerController bannerController = Get.find<BannerController>();
 
-    // Calculate responsive spacing based on screen width
     double spacing = MediaQuery.of(context).size.width < 600 ? 16.0 : 32.0;
 
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 170, // Adjust the banner height as needed
-      padding: EdgeInsets.symmetric(horizontal: spacing),
+      height: 230,
+      padding: EdgeInsets.fromLTRB(spacing, spacing, spacing, 0.0),
       decoration: BoxDecoration(
         color: Color(0xFFF7F7F7),
         boxShadow: [
@@ -24,7 +24,7 @@ class BannerArea extends StatelessWidget {
             color: Colors.grey.withOpacity(0.2),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 2), // Add a subtle shadow
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -52,44 +52,56 @@ class BannerArea extends StatelessWidget {
               ),
             );
           } else {
-            return Stack(
-              alignment: Alignment.bottomCenter,
+            return Column(
               children: [
-                PageView.builder(
+                CarouselSlider.builder(
                   itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return ClipRRect(
-                      child: BannerWidget(
-                        imageUrl: snapshot.data![index],
-                      ),
+                  itemBuilder: (context, index, realIndex) {
+                    return BannerWidget(
+                      imageUrl: snapshot.data![index],
                     );
                   },
+                  options: CarouselOptions(
+                    height: 170,
+                    viewportFraction: 1.0,
+                    autoPlay: true,
+                    autoPlayInterval: Duration(seconds: 3),
+                    autoPlayAnimationDuration: Duration(milliseconds: 800),
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    pauseAutoPlayOnTouch: true,
+                    aspectRatio: 16 / 9,
+                    onPageChanged: (index, reason) {
+                      bannerController.updateCurrentBanner(index);
+                    },
+                  ),
                 ),
-                _buildPageIndicator(snapshot.data!.length),
+                SizedBox(
+                  height: 20,
+                ),
+                Obx(
+                  () => Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      snapshot.data!.length,
+                      (index) => Container(
+                        height: 10,
+                        width: 10,
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color:
+                                bannerController.carousalCurrentIndex.value ==
+                                        index
+                                    ? Colors.blue
+                                    : Colors.grey),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             );
           }
         },
-      ),
-    );
-  }
-
-  Widget _buildPageIndicator(int pageCount) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(pageCount, (index) {
-          return Container(
-            width: 8.0,
-            height: 8.0,
-            margin: EdgeInsets.symmetric(horizontal: 4.0),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.blue, // Indicator color
-            ),
-          );
-        }),
       ),
     );
   }
@@ -107,9 +119,6 @@ class BannerWidget extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
-        placeholder: (context, url) => Center(
-          child: CircularProgressIndicator(),
-        ),
         errorWidget: (context, url, error) => Icon(
           Icons.error,
         ),

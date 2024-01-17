@@ -55,7 +55,7 @@ class BannerArea extends StatelessWidget {
             return Column(
               children: [
                 CarouselSlider.builder(
-                  itemCount: snapshot.data!.length,
+                  itemCount: snapshot.data!.length > 5 ? 5 : snapshot.data!.length,
                   itemBuilder: (context, index, realIndex) {
                     return BannerWidget(
                       imageUrl: snapshot.data![index],
@@ -65,7 +65,7 @@ class BannerArea extends StatelessWidget {
                     height: 170,
                     viewportFraction: 1.0,
                     autoPlay: true,
-                    autoPlayInterval: Duration(seconds: 3),
+                    autoPlayInterval: Duration(seconds: 4),
                     autoPlayAnimationDuration: Duration(milliseconds: 800),
                     autoPlayCurve: Curves.fastOutSlowIn,
                     pauseAutoPlayOnTouch: true,
@@ -82,7 +82,7 @@ class BannerArea extends StatelessWidget {
                   () => Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      snapshot.data!.length,
+                      snapshot.data!.length > 5 ? 5 : snapshot.data!.length,
                       (index) => Container(
                         height: 10,
                         width: 10,

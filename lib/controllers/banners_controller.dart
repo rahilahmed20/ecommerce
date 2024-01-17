@@ -11,7 +11,12 @@ class BannerController extends GetxController {
   }
 
   Stream<List<String>> getBannerUrls() {
-    return _firestore.collection('banners').snapshots().map((snapshot) {
+    return _firestore
+        .collection('banners')
+        .orderBy('timestamp',
+            descending: true) // Assuming 'timestamp' is your timestamp field
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) => doc['image'] as String).toList();
     });
   }

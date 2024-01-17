@@ -14,43 +14,68 @@ class CategoryItem extends StatelessWidget {
 
     return Obx(
       () {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GridView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4, // Always 4 columns
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0, // Adjust spacing as needed
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Column(
+            children: [
+              SizedBox(
+                height: 20,
               ),
-              itemCount: categoryController.categories.length > 8
-                  ? 8
-                  : categoryController.categories.length,
-              itemBuilder: (context, index) {
-                return InkWell(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return AllCategoryProductScreen(
-                            categoryData: categoryController.categories[index]);
-                      }));
-                    },
-                    child: Container(
-                      width: 83,
-                      height: 99,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: const BoxDecoration(),
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 69,
-                            child: SizedBox(
+              Row(
+                children: List.generate(
+                  categoryController.categories.length > 8
+                      ? 8
+                      : categoryController.categories.length,
+                  (index) {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return AllCategoryProductScreen(
+                                categoryData:
+                                    categoryController.categories[index],
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8.0),
+                        width: 83,
+                        height: 110,
+                        clipBehavior: Clip.antiAlias,
+                        decoration: const BoxDecoration(),
+                        child: Column(
+                          children: [
+                            Image.network(
+                              categoryController
+                                  .categories[index].categoryImage,
+                              width: 57,
+                              height: 57,
+                              fit: BoxFit.cover,
+                            ),
+                            // Material(
+                            //   type: MaterialType.transparency,
+                            //   borderRadius: BorderRadius.circular(12),
+                            //   clipBehavior: Clip.antiAlias,
+                            //   child: InkWell(
+                            //     onTap: () {},
+                            //     overlayColor:
+                            //         const MaterialStatePropertyAll<Color>(
+                            //       Color(0x0c7f7f7f),
+                            //     ),
+                            //     child: Ink(
+                            //       color: Colors.white,
+                            //       width: 63,
+                            //       height: 63,
+                            //     ),
+                            //   ),
+                            // ),
+                            SizedBox(
                               width: 83,
-                              height: 30,
+                              height: 40,
                               child: Text(
                                 categoryController
                                     .categories[index].categoryName,
@@ -63,45 +88,15 @@ class CategoryItem extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            left: 10,
-                            top: 0,
-                            child: Material(
-                              type: MaterialType.transparency,
-                              borderRadius: BorderRadius.circular(12),
-                              clipBehavior: Clip.antiAlias,
-                              child: InkWell(
-                                onTap: () {},
-                                overlayColor:
-                                    const MaterialStatePropertyAll<Color>(
-                                  Color(0x0c7f7f7f),
-                                ),
-                                child: Ink(
-                                  color: Colors.white,
-                                  width: 63,
-                                  height: 63,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 18,
-                            top: 5,
-                            child: Image.network(
-                              categoryController
-                                  .categories[index].categoryImage,
-                              width: 47,
-                              height: 47,
-                              fit: BoxFit.cover,
-                            ),
-                          )
-                        ],
+                          ],
+                        ),
                       ),
-                    ));
-              },
-            ),
-          ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

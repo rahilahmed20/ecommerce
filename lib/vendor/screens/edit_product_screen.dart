@@ -515,30 +515,32 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
   }
 
   Widget buildDropdownField(String labelText) {
-    return DropdownButtonFormField(
-      value: _selectedCategory,
-      onChanged: (String? value) {
-        if (value != null) {
-          setState(() {
-            _selectedCategory = value;
-          });
-        }
-      },
-      items: _categoryList.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      decoration: InputDecoration(
-        labelText: labelText,
-        filled: true,
-        fillColor: Colors.grey[200],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide.none,
+    return Expanded(
+      child: DropdownButtonFormField(
+        value: _selectedCategory,
+        onChanged: (String? value) {
+          if (value != null) {
+            setState(() {
+              _selectedCategory = value;
+            });
+          }
+        },
+        items: _categoryList.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        decoration: InputDecoration(
+          labelText: labelText,
+          filled: true,
+          fillColor: Colors.grey[200],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: EdgeInsets.all(8.0),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       ),
     );
   }

@@ -23,6 +23,11 @@ class CategoryController extends GetxController {
           );
         }).toList(),
       );
+
+      // Shuffle the categories
+      categories.shuffle();
+
+      // Now, you have shuffled categories in the 'categories' list.
     }, onError: (error) {
       print("Error fetching categories: $error");
     });

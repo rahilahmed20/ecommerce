@@ -84,8 +84,8 @@ class BannerArea extends StatelessWidget {
                     children: List.generate(
                       snapshot.data!.length > 5 ? 5 : snapshot.data!.length,
                       (index) => Container(
-                        height: 10,
-                        width: 10,
+                        height: 5,
+                        width: 17,
                         margin: EdgeInsets.symmetric(horizontal: 5.0),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),

@@ -3,9 +3,42 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/views/screens/authentication_screens/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class VendorAccountScreen extends StatelessWidget {
+import '../../views/screens/splash_screen.dart';
+import '../authentication/logout_confirmation_modal.dart';
+import '../authentication/vendor_login_Screen.dart';
+
+class VendorAccountScreen extends StatefulWidget {
   const VendorAccountScreen({super.key});
+
+  @override
+  State<VendorAccountScreen> createState() => _VendorAccountScreenState();
+}
+
+class _VendorAccountScreenState extends State<VendorAccountScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  
+  void _showLogoutConfirmationDialog() async {
+    bool confirmLogout = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return LogoutConfirmationDialog();
+      },
+    );
+
+    if (confirmLogout != null && confirmLogout) {
+      await _auth.signOut().whenComplete(() async {
+        var sharedPref = await SharedPreferences.getInstance();
+        sharedPref.setBool(SplashScreenState.KEYLOGIN, false);
+        sharedPref.setBool(VendorLoginScreenState.IsVendor, false);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) {
+          return LoginScreen();
+        }));
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,12 +93,7 @@ class VendorAccountScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: IconButton(
                       onPressed: () async {
-                        await FirebaseAuth.instance.signOut().whenComplete(() {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return LoginScreen();
-                          }));
-                        });
+                        _showLogoutConfirmationDialog();
                       },
                       icon: Icon(
                         Icons.logout,

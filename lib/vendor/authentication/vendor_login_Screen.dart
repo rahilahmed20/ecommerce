@@ -7,17 +7,23 @@ import 'package:macstore/vendor/screens/vendor_main_screen.dart';
 import 'package:macstore/views/screens/authentication_screens/register_screen.dart';
 import 'package:macstore/views/screens/widgets/button_widget.dart';
 import 'package:macstore/views/screens/widgets/custom_text_Field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../views/screens/main_screen.dart';
+import '../../views/screens/splash_screen.dart';
 
 class VendorLoginScreen extends StatefulWidget {
   VendorLoginScreen({super.key});
 
   @override
-  State<VendorLoginScreen> createState() => _VendorLoginScreenState();
+  State<VendorLoginScreen> createState() => VendorLoginScreenState();
 }
 
-class _VendorLoginScreenState extends State<VendorLoginScreen> {
+class VendorLoginScreenState extends State<VendorLoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final VendorController _authController = VendorController();
+
+  static const String IsVendor = "false";
 
   late String email;
 
@@ -45,7 +51,13 @@ class _VendorLoginScreenState extends State<VendorLoginScreen> {
         String userRole = res['role'];
 
         if (userRole == 'vendor') {
+          var sharedPref = await SharedPreferences.getInstance();
+          sharedPref.setBool(SplashScreenState.KEYLOGIN, true);
+
+          sharedPref.setBool(IsVendor, true);
+
           Get.offAll(vendorMainScreen());
+
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text('Logged in as a vendor')));
         } else {
@@ -86,7 +98,7 @@ class _VendorLoginScreenState extends State<VendorLoginScreen> {
                         color: Color(0xFF0d120E),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.2,
-                        fontSize: 18,
+                        fontSize: 24,
                       ),
                     ),
                     Text(
@@ -102,14 +114,17 @@ class _VendorLoginScreenState extends State<VendorLoginScreen> {
                       width: 200,
                       height: 200,
                     ),
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Email',
-                        style: GoogleFonts.getFont(
-                          'Nunito Sans',
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          'Email',
+                          style: GoogleFonts.getFont(
+                            'Nunito Sans',
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.2,
+                          ),
                         ),
                       ),
                     ),
@@ -138,14 +153,17 @@ class _VendorLoginScreenState extends State<VendorLoginScreen> {
                     SizedBox(
                       height: 15,
                     ),
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Password',
-                        style: GoogleFonts.getFont(
-                          'Nunito Sans',
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          'Password',
+                          style: GoogleFonts.getFont(
+                            'Nunito Sans',
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.2,
+                          ),
                         ),
                       ),
                     ),

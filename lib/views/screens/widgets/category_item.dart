@@ -79,6 +79,7 @@ class CategoryItem extends StatelessWidget {
                               child: Text(
                                 categoryController
                                     .categories[index].categoryName,
+                                maxLines: 2,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.quicksand(
                                   color: Colors.black,

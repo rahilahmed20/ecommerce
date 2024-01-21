@@ -1,5 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:macstore/vendor/authentication/vendor_login_Screen.dart';
+import 'package:macstore/vendor/screens/vendor_main_screen.dart';
 import 'package:macstore/views/screens/authentication_screens/login_screen.dart';
 import 'package:macstore/views/screens/home_Screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
@@ -24,7 +26,8 @@ class SplashScreenState extends State<SplashScreen> {
 
   Future<void> loadNextScreen() async {
     nextScreen = await whereToGo();
-    setState(() {}); // Update the state to trigger a rebuild with the new nextScreen
+    setState(
+        () {}); // Update the state to trigger a rebuild with the new nextScreen
   }
 
   @override
@@ -48,10 +51,16 @@ class SplashScreenState extends State<SplashScreen> {
 Future<Widget> whereToGo() async {
   var sharedPref = await SharedPreferences.getInstance();
   var loginValue = sharedPref.getBool(SplashScreenState.KEYLOGIN);
+  var isVendor = sharedPref.getBool(VendorLoginScreenState.IsVendor);
 
   if (loginValue == null) {
     return LoginScreen();
   }
 
-  return loginValue ? MainScreen() : LoginScreen();
+  if (isVendor == true) {
+    return vendorMainScreen();
+  } else if (loginValue) {
+    return MainScreen();
+  }
+  return LoginScreen();
 }

@@ -14,7 +14,7 @@ class BannerController extends GetxController {
     return _firestore
         .collection('banners')
         .orderBy('timestamp',
-            descending: true) // Assuming 'timestamp' is your timestamp field
+            descending: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) => doc['image'] as String).toList();

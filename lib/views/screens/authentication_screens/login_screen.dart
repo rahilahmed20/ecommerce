@@ -10,6 +10,7 @@ import 'package:macstore/views/screens/splash_screen.dart';
 import 'package:macstore/views/screens/widgets/button_widget.dart';
 import 'package:macstore/views/screens/widgets/custom_text_Field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:macstore/vendor/authentication/vendor_login_Screen.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -87,6 +88,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    SizedBox(
+                      height: 30,
+                    ),
                     Text(
                       "Login Your Account",
                       style: GoogleFonts.roboto(
@@ -248,6 +252,31 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           child: Text(
                             'Create account?',
+                            style: GoogleFonts.roboto(),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Login vendor account?',
+                          style: GoogleFonts.roboto(
+                            fontSize: 14,
+                            letterSpacing: 0.1,
+                            height: 1.7,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return VendorLoginScreen();
+                            }));
+                          },
+                          child: Text(
+                            'Login',
                             style: GoogleFonts.roboto(),
                           ),
                         ),

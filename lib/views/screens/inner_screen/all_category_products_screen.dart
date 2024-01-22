@@ -104,7 +104,7 @@ class AllCategoryProductScreen extends StatelessWidget {
               child: GridView.count(
                 physics: ScrollPhysics(),
                 shrinkWrap: true,
-                crossAxisCount: 3,
+                crossAxisCount: 2,
                 mainAxisSpacing: 15,
                 crossAxisSpacing: 15,
                 childAspectRatio: 300 / 500,

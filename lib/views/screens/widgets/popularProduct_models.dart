@@ -34,11 +34,14 @@ class PopularModel extends StatelessWidget {
                   color: Colors.white,
                   border: Border.all(color: Color(0xFFD9D9D9)),
                 ),
-                child: Image.network(
-                  popularProduct['productImages'][0],
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.network(
+                    popularProduct['productImages'][0],
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),

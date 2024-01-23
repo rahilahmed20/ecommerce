@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/provider/favorite_provider.dart';
 import 'package:macstore/provider/product_provider.dart';
 import 'package:macstore/provider/size_provider.dart';
+import 'package:macstore/views/screens/widgets/curved_edges.dart';
 import 'package:macstore/views/screens/widgets/product_models.dart';
 import 'package:custom_rating_bar/custom_rating_bar.dart' as rate;
 
@@ -46,380 +47,511 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
     final selectedSize = ref.watch(selectedSizeProvider);
     return Scaffold(
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
-                child: SizedBox(
-                  width: 386,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
+        child: Column(
+          children: [
+            // Product Image Slider
+            ClipPath(
+              clipper: CustomCurvedEdges(),
+              child: Container(
+                color: Colors.grey.withOpacity(0.4),
+                child: Stack(
+                  children: [
+                    // Main Large Image
+                    SizedBox(
+                        height: 400,
+                        child: Padding(
+                          padding: const EdgeInsets.all(40),
+                          child: Center(
+                            child: Image.network(
+                              widget.productData['productImages'][0],
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        )),
+
+                    // Image Slider
+                    Positioned(
+                      bottom: 30,
+                      right: 0,
+                      left: 0,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: SizedBox(
+                            height: 80,
+                            child: ListView.separated(
+                                itemCount:
+                                    widget.productData['productImages'].length,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                physics: AlwaysScrollableScrollPhysics(),
+                                separatorBuilder: (_, __) => const SizedBox(
+                                      width: 10,
+                                    ),
+                                itemBuilder: (_, index) => GestureDetector(
+                                      onTap: () {},
+                                      child: Container(
+                                        width: 80,
+                                        padding: EdgeInsets.all(8.0),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.blueAccent),
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(16)),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          child: Image.network(
+                                            widget.productData['productImages']
+                                                [index],
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ),
+                                      ),
+                                    )),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // App Bar Icons
+                    AppBar(
+                      automaticallyImplyLeading: false,
+                      backgroundColor: Colors.transparent,
+                      leading: IconButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
                         icon: Icon(
-                          Icons.arrow_back_ios,
+                          Icons.arrow_back_outlined,
+                          color: Colors.black,
                         ),
                       ),
-                      Expanded(
+                      actions: [
+                        IconButton(
+                          onPressed: () {
+                            if (_favoriteProvider.getFavoriteItem
+                                .containsKey(widget.productData['productId'])) {
+                              _favoriteProvider
+                                  .removeItem(widget.productData['productId']);
+                            } else {
+                              _favoriteProvider.addProuctToFavorite(
+                                  productName:
+                                      widget.productData['productName'],
+                                  productId: widget.productData['productId'],
+                                  imageUrl: widget.productData['productImages'],
+                                  price: widget.productData['price'],
+                                  productSize:
+                                      widget.productData['productSize']);
+                            }
+                          },
+                          icon: _favoriteProvider.getFavoriteItem
+                                  .containsKey(widget.productData['productId'])
+                              ? Icon(
+                                  Icons.favorite,
+                                  color: Colors.red,
+                                  size: 18,
+                                )
+                              : Icon(
+                                  Icons.favorite_border,
+                                  color: Colors.black,
+                                  size: 18,
+                                ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+
+            // Product Details
+            Padding(
+              padding: EdgeInsets.only(right: 24, left: 24, bottom: 24),
+              child: Column(
+                children: [
+                  // Rating and Share
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Rating
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                            size: 24,
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+
+                          // Dummy Rating
+                          Text('5.0'),
+                          SizedBox(
+                            width: 8,
+                          ),
+
+                          // Dummy Rating Number
+                          Text('(299)'),
+
+                          // Original Rating Code
+                          if (widget.productData != null &&
+                              widget.productData.data().containsKey('rating'))
+                            widget.productData['rating'] == 0
+                                ? Text("")
+                                : Text(
+                                    widget.productData['rating'].toString(),
+                                    style: TextStyle(
+                                      color: Color(0xFF7F8E9D),
+                                      fontSize: 12,
+                                      fontFamily: 'Lato',
+                                    ),
+                                  ),
+                        ],
+                      ),
+
+                      // Share Button
+                      IconButton(onPressed: () {}, icon: Icon(Icons.share))
+                    ],
+                  ),
+
+                  // Price, Title, Stock and Brand
+                  Column(
+                    children: [
+                      // price and sale tag
+                      Row(
+                        children: [
+                          // Sale Tag
+                          if ((widget.productData['price'] -
+                                  widget.productData['discountPrice']) >
+                              0)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.yellow.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '${((widget.productData['price'] - widget.productData['discountPrice']) / widget.productData['price'] * 100).floor()}% Off',
+                                style: TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.w500),
+                              ),
+                            ),
+
+                          SizedBox(
+                            width: 10,
+                          ),
+
+                          // Original Price (if not equal to discounted price)
+                          if (widget.productData['price'] !=
+                              widget.productData['discountPrice'])
+                            Text(
+                              '\u{20B9}' +
+                                  (widget.productData['price'] % 1 == 0
+                                      ? widget.productData['price']
+                                          .toInt()
+                                          .toString()
+                                      : widget.productData['price'].toString()),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                                letterSpacing: 0.3,
+                                decoration: TextDecoration.lineThrough,
+                                fontFamily: 'Lato',
+                              ),
+                            ),
+
+                          SizedBox(
+                            width: 10,
+                          ),
+
+                          // Discounted Price
+                          Text(
+                            '\u{20B9}' +
+                                (widget.productData['discountPrice'] % 1 == 0
+                                    ? widget.productData['discountPrice']
+                                        .toInt()
+                                        .toString()
+                                    : widget.productData['discountPrice']
+                                        .toString()),
+                            style: TextStyle(
+                              color: Color(0xFF1E3354),
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.4,
+                              fontFamily: 'Lato',
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 5),
+
+                      // title
+                      Text(
+                        widget.productData['productName'],
+                        textAlign: TextAlign.left,
+                        style: GoogleFonts.getFont(
+                          'Lato',
+                          // color: const Color(0xFF3C55EF),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+
+                      SizedBox(
+                        height: 5,
+                      ),
+
+                      Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          'Product Detail',
-                          textAlign: TextAlign.center,
+                          widget.productData['category'],
                           style: GoogleFonts.getFont(
                             'Lato',
-                            color: Color(0xFF363330),
-                            fontSize: 18,
+                            color: const Color(0xFF9A9998),
+                            fontSize: 17,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 1,
                           ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          _favoriteProvider.addProuctToFavorite(
-                              productName: widget.productData['productName'],
-                              productId: widget.productData['productId'],
-                              imageUrl: widget.productData['productImages'],
-                              price: widget.productData['price'],
-                              productSize: widget.productData['productSize']);
-                        },
-                        icon: _favoriteProvider.getFavoriteItem
-                                .containsKey(widget.productData['productId'])
-                            ? Icon(
-                                Icons.favorite,
-                                color: Colors.red,
+                    ],
+                  ),
 
-                                // size: 16,
-                              )
-                            : Icon(
-                                Icons.favorite_border,
-                                color: Colors.red,
-                                // size: 16,
-                              ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Center(
-                child: Container(
-                  width: 260,
-                  height: 274,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: const BoxDecoration(),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 260,
-                          height: 260,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFD8DDFF),
-                            borderRadius: BorderRadius.circular(130),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 22,
-                        top: 0,
-                        child: Container(
-                          width: 216,
-                          height: 274,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF9CA8FF),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: Container(
-                          height: 300,
-                          child: PageView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount:
-                                widget.productData['productImages'].length,
-                            itemBuilder: ((context, index) {
-                              return Image.network(
-                                widget.productData['productImages'][index],
-                                width: 196,
-                                height: 225,
-                                fit: BoxFit.cover,
-                              );
-                            }),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: 390,
-                height: 78,
-                alignment: Alignment.center,
-                clipBehavior: Clip.hardEdge,
-                decoration: const BoxDecoration(),
-                child: SizedBox(
-                  width: 390,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  widget.productData['productName'],
-                                  style: GoogleFonts.getFont(
-                                    'Lato',
-                                    color: const Color(0xFF3C55EF),
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ),
-                              // const SizedBox(height: 8),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  widget.productData['category'],
-                                  style: GoogleFonts.getFont(
-                                    'Lato',
-                                    color: const Color(0xFF9A9998),
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ),
-                              if (widget.productData
-                                  .data()
-                                  .containsKey('rating'))
-                                rate.RatingBar.readOnly(
-                                  filledIcon: Icons.star,
-                                  emptyIcon: Icons.star_border,
-                                  initialRating: widget.productData['rating'],
-                                  maxRating: 5,
-                                  size: 18,
-                                )
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 178),
-                      Container(
-                        height: 78,
-                        alignment: const Alignment(0, -0.59),
-                        child: Text(
-                          '\$${widget.productData['discountPrice'].toStringAsFixed(2)}',
-                          textAlign: TextAlign.right,
-                          style: GoogleFonts.getFont(
-                            'Lato',
-                            color: const Color(0xFF3C55EF),
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 317,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    widget.productData['productSize'].isEmpty
-                        ? Text('')
-                        : Container(
-                            height: 30,
-                            alignment: const Alignment(0, -0.2),
-                            child: Text(
-                              'Size :',
-                              style: GoogleFonts.getFont(
-                                'Lato',
-                                color: const Color(0xFF343434),
-                                fontSize: 16,
-                                height: 1.6,
-                              ),
+                  // Give Rating
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (widget.productData
+                                    .data()
+                                    .containsKey('rating'))
+                                  rate.RatingBar.readOnly(
+                                    filledIcon: Icons.star,
+                                    emptyIcon: Icons.star_border,
+                                    initialRating: widget.productData['rating'],
+                                    maxRating: 5,
+                                    size: 18,
+                                  )
+                              ],
                             ),
                           ),
-                    // SizedBox(
-                    //   width: 138,
-                    // ),
-                    Container(
-                      height: 50,
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: widget.productData['productSize'].length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: InkWell(
-                                onTap: () {
-                                  final newSelected =
-                                      widget.productData['productSize'][index];
+                        ),
+                      ],
+                    ),
+                  ),
 
-                                  ref
-                                      .read(selectedSizeProvider.notifier)
-                                      .setSelectedSize(newSelected);
-                                },
-                                child: Container(
-                                  clipBehavior: Clip.hardEdge,
-                                  decoration: BoxDecoration(
-                                    color: selectedSize ==
-                                            widget.productData['productSize']
-                                                [index]
-                                        ? Color(0xFFF6F6F7)
-                                        : const Color(0xFF126881),
-                                    borderRadius: BorderRadius.circular(5),
+                  // Attributes
+                  SizedBox(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        widget.productData['productSize'].isEmpty
+                            ? Text('')
+                            : Container(
+                                height: 30,
+                                alignment: const Alignment(0, -0.2),
+                                child: Text(
+                                  'Size :',
+                                  style: GoogleFonts.getFont(
+                                    'Lato',
+                                    color: const Color(0xFF343434),
+                                    fontSize: 16,
+                                    height: 1.6,
                                   ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      widget.productData['productSize'][index],
-                                      style: GoogleFonts.quicksand(
+                                ),
+                              ),
+                        Container(
+                          height: 50,
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount:
+                                  widget.productData['productSize'].length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: InkWell(
+                                    onTap: () {
+                                      final newSelected = widget
+                                          .productData['productSize'][index];
+
+                                      ref
+                                          .read(selectedSizeProvider.notifier)
+                                          .setSelectedSize(newSelected);
+                                    },
+                                    child: Container(
+                                      clipBehavior: Clip.hardEdge,
+                                      decoration: BoxDecoration(
                                         color: selectedSize ==
                                                 widget.productData[
                                                     'productSize'][index]
-                                            ? Colors.black
-                                            : Color(0xFFF6F6F7),
-                                        fontSize: 14,
+                                            ? Colors.black.withOpacity(0.35)
+                                            : Colors.black,
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          widget.productData['productSize']
+                                              [index],
+                                          style: GoogleFonts.quicksand(
+                                            color: selectedSize ==
+                                                    widget.productData[
+                                                        'productSize'][index]
+                                                ? Colors.black
+                                                : Color(0xFFF6F6F7),
+                                            fontSize: 14,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                'About',
-                style: GoogleFonts.getFont(
-                  'Lato',
-                  color: const Color(0xFF363330),
-                  fontSize: 16,
-                  letterSpacing: 1,
-                ),
-              ),
-              SizedBox(
-                width: 389,
-                child: ValueListenableBuilder<String>(
-                  valueListenable: descriptionNotifier,
-                  builder: (context, description, child) {
-                    return RichText(
-                      textAlign: TextAlign.left,
-                      text: TextSpan(
-                        style: GoogleFonts.getFont(
-                          'Lato',
-                          color: const Color(0xFF797979),
-                          fontSize: 12,
-                          letterSpacing: 1,
-                          height: 1.7,
+                                );
+                              }),
                         ),
-                        children: [
-                          TextSpan(
-                            text: showFullDescription
-                                ? description
-                                : description.substring(
-                                    0, description.length ~/ 2),
-                          ),
-                          if (!showFullDescription)
-                            TextSpan(
-                              text: '... ',
-                              style: TextStyle(
-                                color: Color(0xFF3C54EE),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          if (!showFullDescription)
-                            TextSpan(
-                              text: 'See More',
-                              style: TextStyle(
-                                color: Color(0xFF3C54EE),
-                                fontWeight: FontWeight.bold,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  setState(() {
-                                    showFullDescription = true;
-                                  });
-                                },
-                            ),
-                        ],
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: 20,
+                  ),
+
+                  // Descriptions
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      'About',
+                      style: GoogleFonts.getFont(
+                        'Lato',
+                        color: const Color(0xFF363330),
+                        fontSize: 16,
+                        letterSpacing: 1,
                       ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Related Products',
-                style: GoogleFonts.roboto(
-                  fontSize: 17,
-                ),
-              ),
-              StreamBuilder<QuerySnapshot>(
-                stream: _productsStream,
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Something went wrong');
-                  }
-
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Text("Loading");
-                  }
-
-                  return Container(
-                    height: 250,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        final productData = snapshot.data!.docs[index];
-                        return ProductModel(
-                          productData: productData,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 389,
+                    child: ValueListenableBuilder<String>(
+                      valueListenable: descriptionNotifier,
+                      builder: (context, description, child) {
+                        return RichText(
+                          textAlign: TextAlign.left,
+                          text: TextSpan(
+                            style: GoogleFonts.getFont(
+                              'Lato',
+                              color: const Color(0xFF797979),
+                              fontSize: 12,
+                              letterSpacing: 1,
+                              height: 1.7,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: showFullDescription
+                                    ? description
+                                    : description.substring(
+                                        0, description.length ~/ 2),
+                              ),
+                              if (!showFullDescription)
+                                TextSpan(
+                                  text: '... ',
+                                  style: TextStyle(
+                                    color: Color(0xFF3C54EE),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              if (!showFullDescription)
+                                TextSpan(
+                                  text: 'See More',
+                                  style: TextStyle(
+                                    color: Color(0xFF3C54EE),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      setState(() {
+                                        showFullDescription = true;
+                                      });
+                                    },
+                                ),
+                            ],
+                          ),
                         );
                       },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+
+            Container(
+              padding: EdgeInsets.only(bottom: 70),
+              child: Column(
+                children: [
+                  Text(
+                    'Related Products',
+                    style: GoogleFonts.roboto(
+                      fontSize: 17,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  StreamBuilder<QuerySnapshot>(
+                    stream: _productsStream,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Something went wrong');
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Text("Loading");
+                      }
+
+                      return Container(
+                        height: 280,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            final productData = snapshot.data!.docs[index];
+                            return ProductModel(
+                              productData: productData,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            )
+          ],
         ),
       ),
       bottomSheet: Padding(
         padding: const EdgeInsets.all(8.0),
         child: InkWell(
           onTap: isInCart
-              ? null
+              ? () {
+                  _cartProvider.removeItem(widget.productData['productId']);
+                }
               : () {
                   _cartProvider.addProductToCart(
                     productName: widget.productData['productName'],
@@ -437,32 +569,36 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                   print(_cartProvider.getCartItems.values.first.productName);
                 },
           child: Container(
-            width: 386,
+            width: MediaQuery.of(context).size.width,
             height: 48,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
               color: isInCart ? Colors.grey : const Color(0xFF3B54EE),
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  left: 148,
-                  top: 17,
-                  child: Text(
-                    'ADD TO CART',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.getFont(
-                      'Lato',
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
+            child: Align(
+              alignment: Alignment.center,
+              child: isInCart
+                  ? Text(
+                      'Remove From CART',
+                      style: GoogleFonts.getFont(
+                        'Lato',
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
+                    )
+                  : Text(
+                      'ADD TO CART',
+                      style: GoogleFonts.getFont(
+                        'Lato',
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
                     ),
-                  ),
-                )
-              ],
             ),
           ),
         ),

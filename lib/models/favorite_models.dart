@@ -4,6 +4,7 @@ class FavoriteModel {
   final List imageUrl;
 
   final num price;
+  final num discountPrice;
 
   final List productSize;
 
@@ -13,5 +14,6 @@ class FavoriteModel {
     required this.imageUrl,
     required this.price,
     required this.productSize,
+    required this.discountPrice,
   });
 }

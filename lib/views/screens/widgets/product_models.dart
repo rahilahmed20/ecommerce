@@ -95,7 +95,9 @@ class _ProductModelState extends ConsumerState<ProductModel> {
                               productId: widget.productData['productId'],
                               imageUrl: widget.productData['productImages'],
                               price: widget.productData['price'],
-                              productSize: widget.productData['productSize']);
+                              productSize: widget.productData['productSize'],
+                              discountPrice:
+                                  widget.productData['discountPrice']);
                         }
                       },
                       icon: _favoriteProvider.getFavoriteItem
@@ -158,24 +160,29 @@ class _ProductModelState extends ConsumerState<ProductModel> {
                         // Original Price (if not equal to discounted price)
                         if (widget.productData['price'] !=
                             widget.productData['discountPrice'])
-                          Text(
-                            '\u{20B9}' +
-                                (widget.productData['price'] % 1 == 0
-                                    ? widget.productData['price']
-                                        .toInt()
-                                        .toString()
-                                    : widget.productData['price'].toString()),
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 16,
-                              letterSpacing: 0.3,
-                              decoration: TextDecoration.lineThrough,
-                              fontFamily: 'Lato',
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                '\u{20B9}' +
+                                    (widget.productData['price'] % 1 == 0
+                                        ? widget.productData['price']
+                                            .toInt()
+                                            .toString()
+                                        : widget.productData['price']
+                                            .toString()),
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                  letterSpacing: 0.3,
+                                  decoration: TextDecoration.lineThrough,
+                                  fontFamily: 'Lato',
+                                ),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                            ],
                           ),
-                        SizedBox(
-                          width: 10,
-                        ),
 
                         // Discounted Price
                         Text(

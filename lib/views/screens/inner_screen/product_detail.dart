@@ -22,6 +22,7 @@ class ProductDetail extends ConsumerStatefulWidget {
 class _ProductDetailState extends ConsumerState<ProductDetail> {
   late ValueNotifier<String> descriptionNotifier;
   bool showFullDescription = false;
+  int imageIndex = 0;
 
   @override
   void initState() {
@@ -63,58 +64,65 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                           padding: const EdgeInsets.all(40),
                           child: Center(
                             child: Image.network(
-                              widget.productData['productImages'][0],
+                              widget.productData['productImages'][imageIndex],
                               fit: BoxFit.cover,
                             ),
                           ),
                         )),
 
                     // Image Slider
-                    Positioned(
-                      bottom: 30,
-                      right: 0,
-                      left: 0,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: SizedBox(
-                            height: 80,
-                            child: ListView.separated(
-                                itemCount:
-                                    widget.productData['productImages'].length,
-                                shrinkWrap: true,
-                                scrollDirection: Axis.horizontal,
-                                physics: AlwaysScrollableScrollPhysics(),
-                                separatorBuilder: (_, __) => const SizedBox(
-                                      width: 10,
-                                    ),
-                                itemBuilder: (_, index) => GestureDetector(
-                                      onTap: () {},
-                                      child: Container(
-                                        width: 80,
-                                        padding: EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.blueAccent),
-                                            color: Colors.white,
+                    if (widget.productData['productImages'].length > 1)
+                      Positioned(
+                        bottom: 30,
+                        right: 0,
+                        left: 0,
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: SizedBox(
+                              height: 80,
+                              child: ListView.separated(
+                                  itemCount: widget
+                                      .productData['productImages'].length,
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  physics: AlwaysScrollableScrollPhysics(),
+                                  separatorBuilder: (_, __) => const SizedBox(
+                                        width: 10,
+                                      ),
+                                  itemBuilder: (_, index) => GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            imageIndex = index;
+                                          });
+                                        },
+                                        child: Container(
+                                          width: 80,
+                                          padding: EdgeInsets.all(8.0),
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: index == imageIndex
+                                                      ? Colors.blueAccent
+                                                      : Colors.grey),
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(16)),
+                                          child: ClipRRect(
                                             borderRadius:
-                                                BorderRadius.circular(16)),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          child: Image.network(
-                                            widget.productData['productImages']
-                                                [index],
-                                            fit: BoxFit.contain,
+                                                BorderRadius.circular(16),
+                                            child: Image.network(
+                                              widget.productData[
+                                                  'productImages'][index],
+                                              fit: BoxFit.contain,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    )),
+                                      )),
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
                     // App Bar Icons
                     AppBar(
@@ -144,7 +152,9 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                                   imageUrl: widget.productData['productImages'],
                                   price: widget.productData['price'],
                                   productSize:
-                                      widget.productData['productSize']);
+                                      widget.productData['productSize'],
+                                  discountPrice:
+                                      widget.productData['discountPrice']);
                             }
                           },
                           icon: _favoriteProvider.getFavoriteItem
@@ -220,6 +230,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
 
                   // Price, Title, Stock and Brand
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // price and sale tag
                       Row(
@@ -249,25 +260,29 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                           // Original Price (if not equal to discounted price)
                           if (widget.productData['price'] !=
                               widget.productData['discountPrice'])
-                            Text(
-                              '\u{20B9}' +
-                                  (widget.productData['price'] % 1 == 0
-                                      ? widget.productData['price']
-                                          .toInt()
-                                          .toString()
-                                      : widget.productData['price'].toString()),
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                                letterSpacing: 0.3,
-                                decoration: TextDecoration.lineThrough,
-                                fontFamily: 'Lato',
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  '\u{20B9}' +
+                                      (widget.productData['price'] % 1 == 0
+                                          ? widget.productData['price']
+                                              .toInt()
+                                              .toString()
+                                          : widget.productData['price']
+                                              .toString()),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                    letterSpacing: 0.3,
+                                    decoration: TextDecoration.lineThrough,
+                                    fontFamily: 'Lato',
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                              ],
                             ),
-
-                          SizedBox(
-                            width: 10,
-                          ),
 
                           // Discounted Price
                           Text(
@@ -294,7 +309,6 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                       // title
                       Text(
                         widget.productData['productName'],
-                        textAlign: TextAlign.left,
                         style: GoogleFonts.getFont(
                           'Lato',
                           // color: const Color(0xFF3C55EF),

@@ -84,22 +84,28 @@ class PopularModel extends StatelessWidget {
                       // Original Price (if not equal to discounted price)
                       if (popularProduct['price'] !=
                           popularProduct['discountPrice'])
-                        Text(
-                          '\u{20B9}' +
-                              (popularProduct['price'] % 1 == 0
-                                  ? popularProduct['price'].toInt().toString()
-                                  : popularProduct['price'].toString()),
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                            letterSpacing: 0.3,
-                            decoration: TextDecoration.lineThrough,
-                            fontFamily: 'Lato',
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              '\u{20B9}' +
+                                  (popularProduct['price'] % 1 == 0
+                                      ? popularProduct['price']
+                                          .toInt()
+                                          .toString()
+                                      : popularProduct['price'].toString()),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                                letterSpacing: 0.3,
+                                decoration: TextDecoration.lineThrough,
+                                fontFamily: 'Lato',
+                              ),
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                          ],
                         ),
-                      SizedBox(
-                        width: 8,
-                      ),
 
                       // Discounted Price
                       Text(

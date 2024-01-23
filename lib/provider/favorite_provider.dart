@@ -17,6 +17,7 @@ class FavoriteNotifier extends StateNotifier<Map<String, FavoriteModel>> {
     required List imageUrl,
     required num price,
     required List productSize,
+    required num discountPrice,
   }) {
     state[productId] = FavoriteModel(
       productName: productName,
@@ -24,6 +25,7 @@ class FavoriteNotifier extends StateNotifier<Map<String, FavoriteModel>> {
       imageUrl: imageUrl,
       price: price,
       productSize: productSize,
+      discountPrice: discountPrice,
     );
 
     ///notify listeners that the state has changed

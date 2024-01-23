@@ -55,7 +55,8 @@ class BannerArea extends StatelessWidget {
             return Column(
               children: [
                 CarouselSlider.builder(
-                  itemCount: snapshot.data!.length > 5 ? 5 : snapshot.data!.length,
+                  itemCount:
+                      snapshot.data!.length > 5 ? 5 : snapshot.data!.length,
                   itemBuilder: (context, index, realIndex) {
                     return BannerWidget(
                       imageUrl: snapshot.data![index],
@@ -119,6 +120,7 @@ class BannerWidget extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
+        width: 350,
         errorWidget: (context, url, error) => Icon(
           Icons.error,
         ),

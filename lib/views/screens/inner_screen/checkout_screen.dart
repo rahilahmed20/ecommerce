@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_stripe/flutter_stripe.dart' as stripe;
-
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:macstore/provider/product_provider.dart';
 import 'package:macstore/views/screens/inner_screen/shipping_address_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
 import 'package:uuid/uuid.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   @override
@@ -20,164 +21,84 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 }
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
+  Razorpay _razorpay = new Razorpay();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Map<String, dynamic>? paymentIntentData;
-
-  Future<void> makePayment(double totalPrice, dynamic data) async {
-    try {
-      String customerId =
-          await createStripeCustomer(data['email'], data['fullName']);
-      final paymentIntent = await createPaymentIntent(totalPrice, customerId);
-
-      var gpay = stripe.PaymentSheetGooglePay(
-        merchantCountryCode: "US",
-        currencyCode: "US",
-        testEnv: true,
-      );
-
-      await stripe.Stripe.instance.initPaymentSheet(
-        paymentSheetParameters: stripe.SetupPaymentSheetParameters(
-          paymentIntentClientSecret: paymentIntent['client_secret'],
-          style: ThemeMode.dark,
-          googlePay: gpay,
-          merchantDisplayName: 'Macaualay',
-        ),
-      );
-
-      // Display the payment sheet
-      displayPaymentSheet(data);
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  Future<String> createStripeCustomer(String email, String name) async {
-    try {
-      final response = await http.post(
-        Uri.parse('https://api.stripe.com/v1/customers'),
-        headers: {
-          'Authorization':
-              'Bearer sk_test_51Nv0TYLcpVDSklU4dydjyJfHJ9KamShhjRJlS3osm696jv1QsHn5HMts03pFxFbwwokNcGRZQRNmFUac1MLeJgnW00Q0oGYb5B', // Replace with your secret key
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: {
-          'email': email,
-          'name': name,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final customerData = json.decode(response.body);
-        return customerData['id']; // Return the customer ID
-      } else {
-        throw Exception('Failed to create customer: ${response.body}');
-      }
-    } catch (e) {
-      throw Exception(e.toString());
-    }
-  }
+  // Map<String, dynamic>? paymentIntentData;
 
   displayPaymentSheet(dynamic data) async {
-    try {
-      await stripe.Stripe.instance.presentPaymentSheet().then((value) async {
-        paymentIntentData = null;
-        print('paid');
+    // showProgress();
+    for (var item in ref.read(cartProvider.notifier).getCartItems.values) {
+      // if (_auth.currentUser == null) {
+      //   // Access _auth.currentUser properties safely
+      //   print("user is not present");
+      // }
 
-        // showProgress();
-        for (var item in ref.read(cartProvider.notifier).getCartItems.values) {
-          DocumentSnapshot userDoc = await _firestore
-              .collection('buyers')
-              .doc(_auth.currentUser!.uid)
-              .get();
+      // DocumentSnapshot userDoc = await _firestore
+      //     .collection('buyers')
+      //     .doc(_auth.currentUser!.uid)
+      //     .get();
 
-          await _firestore.collection('products').doc(item.productId).update({
-            'salesCount': FieldValue.increment(item.quantity.toDouble()),
+      if (_auth.currentUser != null) {
+        DocumentSnapshot userDoc = await _firestore
+            .collection('buyers')
+            .doc(_auth.currentUser!.uid)
+            .get();
+        // Rest of your code that uses userDoc
+        CollectionReference orderRef =
+            FirebaseFirestore.instance.collection('orders');
+        final orderId = const Uuid().v4();
+        await orderRef.doc(orderId).set({
+          'orderId': orderId,
+          'productName': item.productName,
+          'productId': item.productId,
+          'size': item.productSize,
+          'quantity': item.quantity,
+          'price': item.quantity * item.productPrice,
+          'productCategory': item.catgoryName,
+          'productImage': item.imageUrl[0],
+          'state': state,
+          'locality': locality,
+          'pinCode': pinCode,
+          'city': city,
+          'fullName': (userDoc.data() as Map<String, dynamic>)['fullName'],
+          'email': (userDoc.data() as Map<String, dynamic>)['email'],
+          'buyerId': _auth.currentUser!.uid,
+          "deliveredCount": 0,
+          "delivered": false,
+          "processing": true,
+        }).whenComplete(() async {
+          await FirebaseFirestore.instance.runTransaction((transaction) async {
+            DocumentReference documentReference = FirebaseFirestore.instance
+                .collection('products')
+                .doc(item.productId);
+            DocumentSnapshot snapshot2 =
+                await transaction.get(documentReference);
+            transaction.update(documentReference,
+                {'instock': snapshot2['instock'] - item.quantity});
           });
-          CollectionReference orderRef =
-              FirebaseFirestore.instance.collection('orders');
-          final orderId = const Uuid().v4();
-          await orderRef.doc(orderId).set({
-            'orderId': orderId,
-            'productName': item.productName,
-            'productId': item.productId,
-            'size': item.productSize,
-            'quantity': item.quantity,
-            'price': item.quantity * item.productPrice,
-            'productCategory': item.catgoryName,
-            'productImage': item.imageUrl[0],
-            'state': state,
-            'locality': locality,
-            'pinCode': pinCode,
-            'city': city,
-            'fullName': (userDoc.data() as Map<String, dynamic>)['fullName'],
-            'email': (userDoc.data() as Map<String, dynamic>)['email'],
-            'buyerId': _auth.currentUser!.uid,
-            "deliveredCount": 0,
-            "delivered": false,
-            "processing": true,
-            'storeId': item.storeId,
-          }).whenComplete(() async {
-            // await FirebaseFirestore.instance
-            //     .runTransaction((transaction) async {
-            //   DocumentReference documentReference = FirebaseFirestore.instance
-            //       .collection('products')
-            //       .doc(item.documentId);
-            //   DocumentSnapshot snapshot2 =
-            //       await transaction.get(documentReference);
-            //   transaction.update(documentReference,
-            //       {'instock': snapshot2['instock'] - item.qty});
-            // });
-          });
-        }
-        await Future.delayed(const Duration(microseconds: 100))
-            .whenComplete(() {
-          //clear
-          // context.read<Cart>().clearCart();
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return MainScreen();
-          }));
         });
-      });
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future<Map<String, dynamic>> createPaymentIntent(
-    double amount,
-    String customerEmail,
-  ) async {
-    try {
-      Map<String, dynamic> body = {
-        'amount': (amount * 100).toInt().toString(), // Convert amount to cents
-        'currency': "USD",
-        'customer': customerEmail,
-      };
-
-      final response = await http.post(
-        Uri.parse("https://api.stripe.com/v1/payment_intents"),
-        body: body,
-        headers: {
-          'Authorization':
-              'Bearer sk_test_51Nv0TYLcpVDSklU4dydjyJfHJ9KamShhjRJlS3osm696jv1QsHn5HMts03pFxFbwwokNcGRZQRNmFUac1MLeJgnW00Q0oGYb5B', // Replace with your secret key
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
       } else {
-        throw Exception('Failed to create payment intent: ${response.body}');
+        // Handle the case where _auth.currentUser is null
+        print("User is not present");
       }
-    } catch (e) {
-      throw Exception(e.toString());
+      await _firestore.collection('products').doc(item.productId).update({
+        'salesCount': FieldValue.increment(item.quantity.toDouble()),
+      });
     }
+    await Future.delayed(const Duration(microseconds: 100)).whenComplete(() {
+      //clear
+      // context.read<Cart>().clearCart();
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return MainScreen();
+      }));
+    });
   }
 
-  String? selectedPaymentOption;
+  String? selectedPaymentOption = "";
+
   // Variables to store user data
   String pinCode = '';
   String locality = '';
@@ -189,6 +110,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     super.initState();
     // Call the method to set up the stream
     _setupUserDataStream();
+    _razorpay = new Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   void _setupUserDataStream() {
@@ -200,10 +125,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     userDataStream.listen((DocumentSnapshot userData) {
       if (userData.exists) {
         setState(() {
-          pinCode = userData.get('pinCode');
-          locality = userData.get('locality');
-          city = userData.get('city');
-          state = userData.get('state');
+          pinCode = userData.get('pinCode') ?? '';
+          locality = userData.get('locality') ?? '';
+          city = userData.get('city') ?? '';
+          state = userData.get('state') ?? '';
         });
       }
     });
@@ -628,7 +553,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               SizedBox(
                 height: 20,
               ),
-              // Stripe Payment section
+              // Online Payment section
               SizedBox(
                 width: 343,
                 child: Row(
@@ -640,7 +565,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       child: SizedBox.square(
                         dimension: 32,
                         child: Radio<String>(
-                          value: 'Stripe',
+                          value: 'Online',
                           groupValue: selectedPaymentOption,
                           onChanged: (value) {
                             setState(() {
@@ -698,8 +623,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 39),
-                                  Image.network(
-                                    'https://firebasestorage.googleapis.com/v0/b/codeless-app.appspot.com/o/projects%2Fnn2Ldqjoc2Xp89Y7Wfzf%2F2f35b539d532829dbc441c98020be0506058c4542560px-Stripe_Logo%2C_revised_2016%201.png?alt=media&token=5b86d3fc-b121-48a4-8902-41bf82226a59',
+                                  Image.asset(
+                                    'assets/images/pay-online-icon.png',
                                     width: 97,
                                     height: 46,
                                     fit: BoxFit.cover,
@@ -740,8 +665,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     _row(
                         'Payment Method',
                         selectedPaymentOption == 'CashOnDelivery'
-                            ? "COD"
-                            : 'Strip'),
+                            ? "CashOnDelivery"
+                            : 'Online'),
                     _row('sub-total(${cartData.length} items) ',
                         "\$" + totalAmount.toStringAsFixed(2)),
                     _row('Delivery Fee', '${"\$" + "10"}'),
@@ -813,19 +738,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   "deliveredCount": 0,
                   "delivered": false,
                   "processing": true,
-                  'storeId': item.storeId,
                 });
               }).whenComplete(() {
                 setState(() {
                   _isLoading = false;
                   _cartProvider.getCartItems.clear();
+                  sendOrderNotification('21co53@aiktc.ac.in');
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return MainScreen();
                   }));
                 });
               });
             } else {
-              makePayment(totalAmount, userDoc);
+              makePayment(totalAmount);
             }
           },
           child: Container(
@@ -856,6 +781,62 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ),
       ),
     );
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    sendOrderNotification('21co37@aiktc.ac.in');
+  }
+
+  void sendOrderNotification(String adminEmail) async {
+    final smtpServer = gmail('rahilahmed1720@gmail.com',
+        'imoj ervd kkye ronk'); // Update with your email and password or app-specific password
+
+    final message = Message()
+      ..from = Address('rahilahmedsamani@gmail.com', 'Ghar Ka Bazaar')
+      ..recipients.add(adminEmail) // Admin's email
+      ..subject = 'New Order Placed'
+      ..text = 'A new order has been placed. Check the dashboard for details.';
+
+    try {
+      final sendReport = await send(message, smtpServer);
+      print('Mail send Successfully');
+      print('Message sent: ' + sendReport.toString());
+    } catch (e) {
+      print('Something went wrong while sending mail');
+      print('Error sending email: $e');
+    }
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet is selected
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _razorpay.clear();
+  }
+
+  makePayment(double totalAmount) {
+    var options = {
+      'key': "rzp_test_fCBSWTYONMP298",
+      'amount': (totalAmount * 100).toInt(),
+      'name': 'Ghar Ka Bazar',
+      'order_id': "",
+      'prefill': {
+        'contact': '9372952412',
+        'email': 'shaikhwasiullah500@gmail.com'
+      },
+      'external': {
+        'wallets': ['paytm'] // optional, for adding support for wallets
+      }
+    };
+    _razorpay.open(options);
   }
 }
 

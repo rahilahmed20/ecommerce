@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:macstore/provider/product_provider.dart';
-// import 'package:macstore/views/screens/inner_screen/checkout_screen.dart';
+import 'package:macstore/views/screens/inner_screen/checkout_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import "../inner_screen/shipping_address_screen.dart";
 
 class CartScreenProduct extends ConsumerStatefulWidget {
   const CartScreenProduct({Key? key});
@@ -381,7 +382,10 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                         Container(
                             child: ElevatedButton(
                           onPressed: () {
-                            payNowMethod(totalAmount);
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return CheckoutScreen();
+                            }));
                           },
                           child: Text(
                             'Checkout',

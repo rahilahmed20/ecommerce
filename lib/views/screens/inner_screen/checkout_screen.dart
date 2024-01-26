@@ -740,10 +740,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   "processing": true,
                 });
               }).whenComplete(() {
-                setState(() {
+                setState(() async {
                   _isLoading = false;
                   _cartProvider.getCartItems.clear();
-                  sendOrderNotification('21co53@aiktc.ac.in');
+                  DocumentSnapshot userDoc = await _firestore
+                      .collection('buyers')
+                      .doc(_auth.currentUser!.uid)
+                      .get();
+                  String buyerEmail =
+                      (userDoc.data() as Map<String, dynamic>)['email'];
+                  sendOrderNotification(
+                      buyerEmail, "shaikhwasiullah500@gmail.com");
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return MainScreen();
                   }));
@@ -783,16 +790,21 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    sendOrderNotification('21co37@aiktc.ac.in');
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    // sendOrderNotification('21co37@aiktc.ac.in');
+    DocumentSnapshot userDoc =
+        await _firestore.collection('buyers').doc(_auth.currentUser!.uid).get();
+    String buyerEmail = (userDoc.data() as Map<String, dynamic>)['email'];
+    print('buyerEmail is --> $buyerEmail');
+    sendOrderNotification(buyerEmail, "shaikhwasiullah500@gmail.com");
   }
 
-  void sendOrderNotification(String adminEmail) async {
+  void sendOrderNotification(String buyerEmail, String adminEmail) async {
     final smtpServer = gmail('rahilahmed1720@gmail.com',
         'imoj ervd kkye ronk'); // Update with your email and password or app-specific password
 
     final message = Message()
-      ..from = Address('rahilahmedsamani@gmail.com', 'Ghar Ka Bazaar')
+      ..from = Address(buyerEmail, 'Ghar Ka Bazaar')
       ..recipients.add(adminEmail) // Admin's email
       ..subject = 'New Order Placed'
       ..text = 'A new order has been placed. Check the dashboard for details.';

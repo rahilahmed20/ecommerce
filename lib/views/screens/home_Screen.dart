@@ -22,9 +22,6 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // SizedBox(
-            //   height: 10,
-            // ),
             BannerArea(),
             CategoryItem(),
             ResuseTextWidget(title: 'Recommend for you', subtitle: 'View all'),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:macstore/views/screens/widgets/popularProduct_models.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:macstore/views/screens/widgets/product_models.dart';
 
 class PopularProducts extends StatelessWidget {
   const PopularProducts({Key? key});
@@ -9,13 +8,9 @@ class PopularProducts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Stream<QuerySnapshot> _productsStream = FirebaseFirestore.instance
-        .collection(
-          'products',
-        )
-        .where(
-          'popular',
-          isEqualTo: true,
-        )
+        .collection('products')
+        .where('salesCount', isGreaterThan: 0) // Filter where salesCount is greater than 0
+        .orderBy('salesCount', descending: true) // Sort by salesCount in ascending order
         .snapshots();
 
     return StreamBuilder<QuerySnapshot>(
@@ -30,19 +25,16 @@ class PopularProducts extends StatelessWidget {
         }
 
         return Container(
-          child: GridView.count(
-            physics: ScrollPhysics(),
-            shrinkWrap: true,
-            crossAxisCount: 3,
-            mainAxisSpacing: 15,
-            crossAxisSpacing: 15,
-            childAspectRatio: 300 / 500,
-            children: List.generate(snapshot.data!.size, (index) {
+          height: 280,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: snapshot.data!.docs.length > 20 ? 20 : snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
               final popularProduct = snapshot.data!.docs[index];
-              return PopularModel(
-                popularProduct: popularProduct,
+              return ProductModel(
+                productData: popularProduct,
               );
-            }),
+            },
           ),
         );
       },

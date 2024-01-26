@@ -22,10 +22,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
 
   late String email;
-
   late String fullName;
-
   late String password;
+  late String phoneNumber;
 
   registerUser() async {
     if (_formKey.currentState!.validate()) {
@@ -37,6 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email,
         fullName,
         password,
+        phoneNumber,
       );
 
       setState(() {
@@ -46,27 +46,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (res == 'success') {
         Get.to(LoginScreen());
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text('congratulations account has been created for you..')));
+          content: Text('Congratulations! Your account has been created.'),
+        ));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('something went wrong'),
+            content: Text('Something went wrong'),
           ),
         );
       }
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('please enter all fields')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter all fields')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white.withOpacity(
-        0.95,
-      ),
+      backgroundColor: Colors.white.withOpacity(0.95),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -173,6 +172,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       text: 'enter email',
+                    ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
+                        child: Text(
+                          'Phone Number',
+                          style: GoogleFonts.getFont(
+                            'Nunito Sans',
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ),
+                    ),
+                    CustomTextField(
+                      onChanged: (value) {
+                        phoneNumber = value;
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Enter your phone number';
+                        } else {
+                          return null;
+                        }
+                      },
+                      label: 'Enter your phone number',
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Image.asset(
+                          'assets/images/phone.png',
+                          width: 20,
+                          height: 20,
+                        ),
+                      ),
+                      text: 'enter phone number',
                     ),
                     Align(
                       alignment: Alignment.topLeft,

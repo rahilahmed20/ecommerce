@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/views/screens/inner_screen/order_detail_screen.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server/gmail.dart';
 
 class OrderScreen extends StatelessWidget {
   const OrderScreen({super.key});
@@ -133,7 +135,6 @@ class OrderScreen extends StatelessWidget {
                                           height: 78,
                                           clipBehavior: Clip.antiAlias,
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFBCC5FF),
                                             borderRadius:
                                                 BorderRadius.circular(8),
                                           ),
@@ -145,9 +146,9 @@ class OrderScreen extends StatelessWidget {
                                                 top: 5,
                                                 child: Image.network(
                                                   orderData['productImage'],
-                                                  width: 58,
-                                                  height: 67,
-                                                  fit: BoxFit.cover,
+                                                  width: 60,
+                                                  height: 90,
+                                                  fit: BoxFit.contain,
                                                 ),
                                               )
                                             ],
@@ -178,6 +179,9 @@ class OrderScreen extends StatelessWidget {
                                                         child: Text(
                                                           orderData[
                                                               'productName'],
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                           style: GoogleFonts
                                                               .getFont(
                                                             'Lato',
@@ -217,18 +221,23 @@ class OrderScreen extends StatelessWidget {
                                                       Align(
                                                         alignment: Alignment
                                                             .centerLeft,
-                                                        child: Text(
-                                                          'Size: ${orderData['size']}',
-                                                          style: GoogleFonts
-                                                              .getFont(
-                                                            'Lato',
-                                                            color: const Color(
-                                                                0xFF7F808C),
-                                                            fontSize: 12,
-                                                            height: 1.6,
-                                                          ),
-                                                        ),
-                                                      )
+                                                        child: orderData['size']
+                                                                .toString()
+                                                                .isNotEmpty
+                                                            ? Text(
+                                                                'Size: ${orderData['size']}',
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .getFont(
+                                                                  'Lato',
+                                                                  color: const Color(
+                                                                      0xFF7F808C),
+                                                                  fontSize: 12,
+                                                                  height: 1.6,
+                                                                ),
+                                                              )
+                                                            : SizedBox.shrink(),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -242,7 +251,7 @@ class OrderScreen extends StatelessWidget {
                                                 alignment:
                                                     const Alignment(0, -0.07),
                                                 child: Text(
-                                                  '\$' +
+                                                  '\u{20B9}' +
                                                       orderData['price']
                                                           .toString(),
                                                   style: GoogleFonts.getFont(
@@ -329,7 +338,23 @@ class OrderScreen extends StatelessWidget {
                                         left: 0,
                                         top: 0,
                                         child: InkWell(
-                                          onTap: () {},
+                                          onTap: () {
+                                            FirebaseFirestore.instance
+                                                .collection('orders')
+                                                .doc(orderData.id)
+                                                .update({
+                                              'delivered': false
+                                            }).then((_) {
+                                              sendOrderNotification(
+                                                orderData['email'],
+                                                "shaikhwasiullah500@gmail.com",
+                                                orderData.id,
+                                              );
+                                            }).catchError((error) {
+                                              print(
+                                                  'Failed to update order: $error');
+                                            });
+                                          },
                                           child: Image.asset(
                                             'assets/icons/delete.png',
                                             width: 20,
@@ -351,5 +376,49 @@ class OrderScreen extends StatelessWidget {
                 }));
           },
         ));
+  }
+
+  void sendOrderNotification(
+      String buyerEmail, String adminEmail, String orderId) async {
+    final smtpServer = gmail('rahilahmed1720@gmail.com', 'imoj ervd kkye ronk');
+
+    try {
+      // Fetch order data using the orderId
+      DocumentSnapshot orderSnapshot = await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(orderId)
+          .get();
+
+      if (orderSnapshot.exists) {
+        Map<String, dynamic> orderData =
+            orderSnapshot.data() as Map<String, dynamic>;
+
+        final message = Message()
+          ..from = Address('rahilahmed1720@gmail.com', 'Ghar Ka Bazaar')
+          ..recipients.add(buyerEmail) // Buyer's email
+          ..recipients.add(adminEmail) // Admin's email
+          ..subject = 'Order Cancelled'
+          ..html = '''
+        <h3>Your order has been cancelled.</h3>
+        <p>Order Details:</p>
+        <ul>
+          <li>Product Name: ${orderData['productName']}</li>
+          <li>Product Category: ${orderData['productCategory']}</li>
+          <li>Size: ${orderData['size']}</li>
+          <!-- Add more order details as needed -->
+        </ul>
+        <p>For further assistance, contact support.</p>
+      ''';
+
+        final sendReport = await send(message, smtpServer);
+        print('Mail sent Successfully');
+        print('Message sent: ' + sendReport.toString());
+      } else {
+        print('Order document does not exist');
+      }
+    } catch (e) {
+      print('Something went wrong while fetching or sending mail');
+      print('Error: $e');
+    }
   }
 }

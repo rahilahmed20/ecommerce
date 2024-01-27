@@ -141,7 +141,7 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
                                 padding: EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
-                                    color: Colors.black.withOpacity(0.4)),
+                                    color: Colors.black.withOpacity(0.25)),
                                 child: Padding(
                                   padding: EdgeInsets.all(5),
                                   child: Center(

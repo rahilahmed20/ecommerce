@@ -4,7 +4,6 @@ import 'package:macstore/views/screens/widgets/category_item.dart';
 import 'package:macstore/views/screens/widgets/header.dart';
 import 'package:macstore/views/screens/widgets/popular_products.dart';
 import 'package:macstore/views/screens/widgets/recommended_product.dart';
-import 'package:macstore/views/screens/widgets/reuse_text_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -24,12 +23,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             BannerArea(),
             CategoryItem(),
-            ResuseTextWidget(title: 'Recommend for you', subtitle: 'View all'),
             RecommendedProduct(),
-            ResuseTextWidget(
-              title: 'Popular',
-              subtitle: 'View all',
-            ),
             PopularProducts(),
           ],
         ),

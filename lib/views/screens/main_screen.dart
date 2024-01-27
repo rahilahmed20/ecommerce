@@ -34,7 +34,7 @@ class _MainScreenState extends State<MainScreen> {
         },
         currentIndex: pageIndex,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.purple,
+        selectedItemColor: Color(0xFF3C55EF),
         unselectedItemColor: Colors.grey,
         items: [
           BottomNavigationBarItem(
@@ -42,6 +42,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: Image.asset(
               'assets/icons/home.png',
               width: 25,
+              color: pageIndex == 0 ? Color(0xFF3C55EF) : Colors.grey,
             ),
             label: 'Home',
           ),
@@ -49,6 +50,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: Image.asset(
               'assets/icons/love.png',
               width: 25,
+              color: pageIndex == 1 ? Color(0xFF3C55EF) : Colors.grey,
             ),
             label: 'Favorite',
           ),
@@ -63,6 +65,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: Image.asset(
               'assets/icons/cart.png',
               width: 25,
+              color: pageIndex == 2 ? Color(0xFF3C55EF) : Colors.grey,
             ),
             label: 'Cart',
           ),
@@ -70,6 +73,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: Image.asset(
               'assets/icons/user.png',
               width: 25,
+              color: pageIndex == 3 ? Color(0xFF3C55EF) : Colors.grey,
             ),
             label: 'Account',
           ),

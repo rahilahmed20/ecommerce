@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:macstore/views/screens/inner_screen/all_products.dart';
 import 'package:macstore/views/screens/widgets/product_models.dart';
+import 'package:macstore/views/screens/widgets/reuse_text_widget.dart';
 
 class RecommendedProduct extends StatelessWidget {
   const RecommendedProduct({Key? key});
@@ -27,19 +31,28 @@ class RecommendedProduct extends StatelessWidget {
         List<QueryDocumentSnapshot> shuffledProducts =
             snapshot.data!.docs.toList()..shuffle();
 
-        return Container(
-          height: 280,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount:
-                shuffledProducts.length > 20 ? 20 : shuffledProducts.length,
-            itemBuilder: (context, index) {
-              final productData = shuffledProducts[index];
-              return ProductModel(
-                productData: productData,
-              );
-            },
-          ),
+        return Column(
+          children: [
+            ReuseTextWidget(
+                title: 'Recommended for you',
+                subtitle: 'View all',
+                products: shuffledProducts,
+                isPopular: false),
+            Container(
+              height: 280,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount:
+                    shuffledProducts.length > 20 ? 20 : shuffledProducts.length,
+                itemBuilder: (context, index) {
+                  final productData = shuffledProducts[index];
+                  return ProductModel(
+                    productData: productData,
+                  );
+                },
+              ),
+            ),
+          ],
         );
       },
     );

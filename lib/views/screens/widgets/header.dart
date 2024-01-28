@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:macstore/views/screens/inner_screen/search_screen.dart';
 
 class HeaderWidget extends StatelessWidget {
   const HeaderWidget({Key? key}) : super(key: key);
@@ -8,7 +9,6 @@ class HeaderWidget extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.155,
-      // height: MediaQuery.of(context).size.height * 0.20,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(),
       child: Stack(
@@ -16,7 +16,6 @@ class HeaderWidget extends StatelessWidget {
           Image.asset(
             'assets/icons/searchBanner.jpeg',
             width: MediaQuery.of(context).size.width,
-            // height: MediaQuery.of(context).size.height * 0.20,
             fit: BoxFit.cover,
           ),
           Padding(
@@ -95,6 +94,12 @@ class HeaderWidget extends StatelessWidget {
                     border: InputBorder.none,
                     alignLabelWithHint: true,
                   ),
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return SearchScreen();
+                    }));
+                  },
                 ),
               ),
             ),

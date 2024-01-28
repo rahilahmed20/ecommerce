@@ -38,6 +38,7 @@ class ReuseTextWidget extends StatelessWidget {
                 return AllProductScreen(
                   products: products,
                   isPopularProducts: isPopular,
+                  isSearch: false,
                 );
               }));
             },

@@ -131,7 +131,7 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                           horizontal: 8, vertical: 20),
                       child: Container(
                         decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.12),
+                            color: Colors.black.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(20)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -308,81 +308,69 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
         decoration: const BoxDecoration(),
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Price
-                Row(
-                  children: [
-                    // Sub Total
-                    Text(
-                      'Subtotal: ',
-                      style: TextStyle(
-                        color: Color(0xFFA1A1A1),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Roboto',
-                      ),
-                    ),
-
-                    // Amount
-                    Text(
-                      '\u{20B9}' + totalAmount.toStringAsFixed(0),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Roboto',
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Checkout Button
-                Container(
-                  width: 140,
-                  height: 40,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(),
-                  child: Container(
-                      child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return CheckoutScreen();
-                      }));
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        Color(0xFF3C55EF),
-                      ), // Change the color as needed
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Checkout',
-                          style: GoogleFonts.getFont(
-                            'Roboto',
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              height: 50,
+              width: MediaQuery.of(context).size.width,
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(),
+              child: totalAmount == 0
+                  ? ElevatedButton(
+                      onPressed: null, // Disabled button
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.grey, // Set color to grey for disabled state
                         ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          size: 14,
+                      ),
+                      child: Text(
+                        'Checkout',
+                        style: GoogleFonts.getFont(
+                          'Roboto',
                           color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ],
+                      ),
+                    )
+                  : ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return CheckoutScreen();
+                        }));
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          Color(0xFF3C55EF),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Checkout',
+                            style: GoogleFonts.getFont(
+                              'Roboto',
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Text(
+                            '\u{20B9} ' + totalAmount.toStringAsFixed(0),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  )),
-                ),
-              ],
             ),
           ),
         ),

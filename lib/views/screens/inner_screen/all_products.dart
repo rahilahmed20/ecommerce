@@ -8,11 +8,13 @@ import 'package:macstore/views/screens/widgets/product_models.dart';
 class AllProductScreen extends StatelessWidget {
   final List<QueryDocumentSnapshot> products;
   final bool isPopularProducts;
+  final bool isSearch;
 
   AllProductScreen({
     Key? key,
     required this.products,
     required this.isPopularProducts,
+    required this.isSearch
   }) : super(key: key);
 
   @override
@@ -21,7 +23,7 @@ class AllProductScreen extends StatelessWidget {
         isPopularProducts ? 'Popular Products' : 'Recommended Products';
 
     return Scaffold(
-      appBar: PreferredSize(
+      appBar: isSearch ? null : PreferredSize(
         preferredSize:
             Size.fromHeight(MediaQuery.of(context).size.height * 0.20),
         child: Container(

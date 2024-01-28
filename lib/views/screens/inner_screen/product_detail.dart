@@ -574,13 +574,13 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                     imageUrl: widget.productData['productImages'],
                     quantity: 1,
                     productId: widget.productData['productId'],
-                    productSize: selectedSize,
+                    productSize: (widget.productData['productSize'].isEmpty)
+                        ? ''
+                        : selectedSize,
                     discount: widget.productData['discountPrice'],
                     description: widget.productData['description'],
                     storeId: widget.productData['storeId'],
                   );
-
-                  print(_cartProvider.getCartItems.values.first.productName);
                 },
           child: Container(
             width: MediaQuery.of(context).size.width,

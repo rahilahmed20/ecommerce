@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
@@ -270,11 +269,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     final cartItem = cartData.values.toList()[index];
-                    return InkWell(
-                      onTap: () {},
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
                       child: Container(
                         width: 336,
-                        height: 91,
+                        height: 100,
                         clipBehavior: Clip.hardEdge,
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -296,15 +295,20 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
-                                      width: 78,
-                                      height: 78,
+                                      width: 85,
+                                      height: 85,
                                       clipBehavior: Clip.hardEdge,
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFBCC5FF),
+                                        color: Colors.grey.withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      child: Image.network(
-                                          cartItem.imageUrl[0].toString()),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Image.network(
+                                          cartItem.imageUrl[0].toString(),
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
                                     ),
                                     const SizedBox(width: 11),
                                     Expanded(
@@ -322,6 +326,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                                 width: double.infinity,
                                                 child: Text(
                                                   cartItem.productName,
+                                                  maxLines: 2,
                                                   style: GoogleFonts.getFont(
                                                     'Lato',
                                                     color:
@@ -356,9 +361,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                       height: 78,
                                       alignment: const Alignment(0, -0.03),
                                       child: Text(
-                                        '\$' +
+                                        '\u{20B9}' +
                                             cartItem.discount
-                                                .toStringAsFixed(2),
+                                                .toStringAsFixed(0),
                                         style: GoogleFonts.getFont(
                                           'Lato',
                                           color: const Color(0xFF0B0C1E),
@@ -390,15 +395,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               SizedBox(
                 height: 10,
               ),
-              ////Cash on Delivery Section
+
+              // Cash on Delivery Section
               SizedBox(
-                width: 344,
+                width: MediaQuery.of(context).size.width * 0.95,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       height: 67,
-                      alignment: const Alignment(0, 0.06),
                       child: SizedBox.square(
                         dimension: 32,
                         child: Radio<String>(
@@ -418,10 +423,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
                     Container(
-                      width: 300,
-                      height: 67,
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      height: 70,
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -430,44 +434,28 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Stack(
-                        clipBehavior: Clip.none,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Positioned(
-                            left: 37,
-                            top: 12,
-                            child: SizedBox(
-                              width: 195,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: 43,
-                                    height: 43,
-                                    clipBehavior: Clip.hardEdge,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFBF7F5),
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Icon(
-                                      Icons.delivery_dining,
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 43,
-                                    alignment: const Alignment(0, -0.09),
-                                    child: Text(
-                                      'Cash On Delivery',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
+                          Container(
+                            width: 43,
+                            height: 43,
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFBF7F5),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Icon(
+                              Icons.delivery_dining,
+                            ),
+                          ),
+                          Text(
+                            'Cash On Delivery',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           )
                         ],
@@ -479,15 +467,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               SizedBox(
                 height: 20,
               ),
+
               // Online Payment section
               SizedBox(
-                width: 343,
+                width: MediaQuery.of(context).size.width * 0.95,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       height: 67,
-                      alignment: const Alignment(0, 0.03),
                       child: SizedBox.square(
                         dimension: 32,
                         child: Radio<String>(
@@ -507,10 +495,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 11),
                     Container(
-                      width: 300,
-                      height: 67,
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      height: 70,
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -519,44 +506,29 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Stack(
-                        clipBehavior: Clip.none,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Positioned(
-                            left: 37,
-                            top: 10,
-                            child: SizedBox(
-                              width: 179,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    height: 46,
-                                    alignment: Alignment.topCenter,
-                                    child: Container(
-                                      width: 43,
-                                      height: 43,
-                                      clipBehavior: Clip.hardEdge,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFBF7F5),
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: Icon(
-                                        CupertinoIcons.money_dollar,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 39),
-                                  Image.asset(
-                                    'assets/images/pay-online-icon.png',
-                                    width: 97,
-                                    height: 46,
-                                    fit: BoxFit.cover,
-                                  )
-                                ],
+                          Container(
+                            height: 46,
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              width: 43,
+                              height: 43,
+                              clipBehavior: Clip.hardEdge,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFBF7F5),
+                                borderRadius: BorderRadius.circular(100),
                               ),
+                              child: Icon(Icons.monetization_on_outlined),
+                            ),
+                          ),
+                          Text(
+                            'Online Payment',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           )
                         ],
@@ -566,8 +538,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 ),
               ),
 
-              ///sumary
-              ///
+              // Summary
               SizedBox(
                 height: 20,
               ),
@@ -594,8 +565,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             ? "CashOnDelivery"
                             : 'Online'),
                     _row('sub-total(${cartData.length} items) ',
-                        "\$" + totalAmount.toStringAsFixed(2)),
-                    _row('Delivery Fee', '${"\$" + "10"}'),
+                        '\u{20B9}' + totalAmount.toStringAsFixed(0)),
+                    _row('Delivery Fee', '${'\u{20B9}' + "10"}'),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -607,7 +578,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           ),
                         ),
                         Text(
-                          "\$" + total.toStringAsFixed(2),
+                          '\u{20B9}' + total.toStringAsFixed(0),
                           style: GoogleFonts.getFont(
                             'Lato',
                             color: const Color(0xFF3B54EE),

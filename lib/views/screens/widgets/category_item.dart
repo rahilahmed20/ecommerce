@@ -56,23 +56,6 @@ class CategoryItem extends StatelessWidget {
                               height: 57,
                               fit: BoxFit.cover,
                             ),
-                            // Material(
-                            //   type: MaterialType.transparency,
-                            //   borderRadius: BorderRadius.circular(12),
-                            //   clipBehavior: Clip.antiAlias,
-                            //   child: InkWell(
-                            //     onTap: () {},
-                            //     overlayColor:
-                            //         const MaterialStatePropertyAll<Color>(
-                            //       Color(0x0c7f7f7f),
-                            //     ),
-                            //     child: Ink(
-                            //       color: Colors.white,
-                            //       width: 63,
-                            //       height: 63,
-                            //     ),
-                            //   ),
-                            // ),
                             SizedBox(
                               width: 83,
                               height: 40,

@@ -7,8 +7,6 @@ import 'package:badges/badges.dart' as badges;
 import 'package:macstore/provider/product_provider.dart';
 import 'package:macstore/views/screens/inner_screen/checkout_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
-import "../inner_screen/shipping_address_screen.dart";
 
 class CartScreenProduct extends ConsumerStatefulWidget {
   const CartScreenProduct({Key? key});
@@ -18,19 +16,6 @@ class CartScreenProduct extends ConsumerStatefulWidget {
 }
 
 class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
-  Razorpay _razorpay = new Razorpay();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _razorpay = new Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-  }
-
-// final totalAmount = ref.read(cartProvider.notifier).calculateTotalAmount();
   @override
   Widget build(BuildContext context) {
     final _cartProvider = ref.read(cartProvider.notifier);
@@ -76,7 +61,6 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                           badgeContent: Text(
                             cartData.length.toString(),
                             style: GoogleFonts.lato(
-                              // fontSize: 11,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
@@ -100,12 +84,10 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
               ),
               Positioned(
                 left: 23,
-                top: 57,
-                child: Image.asset(
-                  'assets/icons/arrow.png',
-                  width: 10,
-                  height: 12,
-                  fit: BoxFit.contain,
+                top: 51,
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
                 ),
               )
             ],
@@ -138,315 +120,273 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
               ),
             )
           : SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 49,
-                    clipBehavior: Clip.hardEdge,
-                    decoration: const BoxDecoration(),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 49,
-                            clipBehavior: Clip.hardEdge,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFD7DDFF),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 44,
-                          top: 19,
-                          child: Container(
-                            width: 10,
-                            height: 10,
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 69,
-                          top: 14,
-                          child: Text(
-                            'You have ${cartData.length} items',
-                            style: GoogleFonts.getFont(
-                              'Lato',
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                      child: ListView.builder(
-                          physics: ScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: cartData.length,
-                          itemBuilder: (context, index) {
-                            final cartItem = cartData.values.toList()[index];
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Card(
-                                child: SizedBox(
-                                  height: 200,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+              child: ListView.builder(
+                  physics: ScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: cartData.length,
+                  itemBuilder: (context, index) {
+                    final cartItem = cartData.values.toList()[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  // Image
+                                  Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Image.network(
+                                      cartItem.imageUrl[0],
+                                      height: 90,
+                                      width: 90,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+
+                                  // Title, Price, Size
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Product Name
+                                        Flexible(
+                                          child: Text(
+                                            cartItem.productName,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+
+                                        // Description
+                                        Flexible(
+                                          child: Text(
+                                            cartItem.description,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontSize: 17,
+                                                color: Colors.black
+                                                    .withOpacity(0.6)),
+                                          ),
+                                        ),
+
+                                        // Size
+                                        if (cartItem.productSize != '')
+                                          Text(
+                                            'Size: ' + cartItem.productSize,
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
                                     children: [
                                       SizedBox(
-                                        height: 100,
-                                        width: 100,
-                                        child: Image.network(
-                                          cartItem.imageUrl[0],
-                                          fit: BoxFit.cover,
-                                        ),
+                                        width: 85,
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              cartItem.productName,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
+                                      // Remove Button
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              if (cartItem.quantity > 1) {
+                                                _cartProvider.decrementItem(
+                                                    cartItem.productId);
+                                              }
+                                            },
+                                            icon: Container(
+                                              width: 26,
+                                              height: 26,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                              ),
+                                              child: Icon(
+                                                Icons.remove,
+                                                size: 20,
+                                                color: Colors.black,
                                               ),
                                             ),
-                                            Text(
-                                              cartItem.discount
-                                                  .toStringAsFixed(2),
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Color(0xFF102DE1),
+                                          ),
+
+                                          // Quantity Text
+                                          Text(
+                                            cartItem.quantity.toString(),
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16),
+                                          ),
+
+                                          // Add Button
+                                          IconButton(
+                                            onPressed: () {
+                                              _cartProvider.incrementItem(
+                                                  cartItem.productId);
+                                            },
+                                            icon: Container(
+                                              width: 26,
+                                              height: 26,
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFF3C55EF),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                              ),
+                                              child: Icon(
+                                                Icons.add,
+                                                size: 20,
+                                                color: Colors.white,
                                               ),
                                             ),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  height: 40,
-                                                  width: 120,
-                                                  decoration: BoxDecoration(
-                                                    color: Color(0xFF102DE1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                      4,
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          _cartProvider
-                                                              .decrementItem(
-                                                                  cartItem
-                                                                      .productId);
-                                                        },
-                                                        icon: Icon(
-                                                          CupertinoIcons.minus,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        cartItem.quantity
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          _cartProvider
-                                                              .incrementItem(
-                                                                  cartItem
-                                                                      .productId);
-                                                        },
-                                                        icon: Icon(
-                                                          CupertinoIcons.plus,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: 15,
-                                                ),
-                                                IconButton(
-                                                  onPressed: () {
-                                                    _cartProvider.removeItem(
-                                                        cartItem.productId);
-                                                  },
-                                                  icon: Icon(
-                                                    CupertinoIcons.delete,
-                                                  ),
-                                                )
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      )
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                ),
-                              ),
-                            );
-                          }))
-                ],
-              ),
+
+                                  // Price
+                                  Text(
+                                    '\u{20B9}' +
+                                        cartItem.discount.toStringAsFixed(0),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+
+                                  // Remove From Cart
+                                  IconButton(
+                                    onPressed: () {
+                                      _cartProvider
+                                          .removeItem(cartItem.productId);
+                                    },
+                                    icon: Icon(
+                                      CupertinoIcons.delete,
+                                    ),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
             ),
       bottomNavigationBar: Container(
-        width: 416,
-        height: 89,
+        width: MediaQuery.of(context).size.width,
+        height: 80,
         clipBehavior: Clip.hardEdge,
         decoration: const BoxDecoration(),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Align(
-              alignment: Alignment.center,
-              child: Container(
-                width: 416,
-                height: 89,
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: const Color(0xFFC4C4C4),
-                  ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Price
+                Row(
+                  children: [
+                    // Sub Total
+                    Text(
+                      'Subtotal: ',
+                      style: TextStyle(
+                        color: Color(0xFFA1A1A1),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
+
+                    // Amount
+                    Text(
+                      '\u{20B9}' + totalAmount.toStringAsFixed(0),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            const Align(
-              alignment: Alignment(-0.63, -0.26),
-              child: Text(
-                'Subtotal ',
-                style: TextStyle(
-                  color: Color(0xFFA1A1A1),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'Roboto',
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment(-0.19, -0.31),
-              child: Text(
-                'Rs' + totalAmount.toStringAsFixed(2),
-                style: TextStyle(
-                  color: Color(0xFFFF6464),
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'Roboto',
-                ),
-              ),
-            ),
-            Align(
-              alignment: const Alignment(0.83, -1),
-              child: InkWell(
-                // onTap: totalAmount == 0.0
-                //     ? null
-                //     : () {
-                //         Navigator.push(context,
-                //             MaterialPageRoute(builder: (context) {
-                //           return CartScreenProduct();
-                //         }));
-                //       },
-                child: Container(
-                  width: 166,
-                  height: 71,
+
+                // Checkout Button
+                Container(
+                  width: 140,
+                  height: 40,
                   clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    color: totalAmount == 0.0 ? Colors.grey : Color(0xFF1532E7),
-                  ),
-                  child: Center(
+                  decoration: BoxDecoration(),
+                  child: Container(
+                      child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return CheckoutScreen();
+                      }));
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        Color(0xFF3C55EF),
+                      ), // Change the color as needed
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Container(
-                            child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return CheckoutScreen();
-                            }));
-                          },
-                          child: Text(
-                            'Checkout',
-                            style: GoogleFonts.getFont(
-                              'Roboto',
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        Text(
+                          'Checkout',
+                          style: GoogleFonts.getFont(
+                            'Roboto',
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
-                        )),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
                         Icon(
-                          Icons.arrow_forward_ios,
+                          Icons.arrow_forward_ios_outlined,
+                          size: 14,
                           color: Colors.white,
                         ),
                       ],
                     ),
-                  ),
+                  )),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
-  }
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    // Do something when payment succeeds
-    // Here we get razorpay_payment_id razorpay_order_id razorpay_signature
-  }
-
-  void _handlePaymentError(PaymentFailureResponse response) {
-    // Do something when payment fails
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    // Do something when an external wallet is selected
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _razorpay.clear();
-  }
-
-  payNowMethod(double totalAmount) {
-    var options = {
-      'key': "rzp_test_fCBSWTYONMP298",
-      'amount': (totalAmount * 100).toInt(),
-      'name': 'Ghar Ka Bazar',
-      'order_id': "",
-      'prefill': {
-        'contact': '9372952412',
-        'email': 'shaikhwasiullah500@gmail.com'
-      },
-      'external': {
-        'wallets': ['paytm'] // optional, for adding support for wallets
-      }
-    };
-    _razorpay.open(options);
   }
 }

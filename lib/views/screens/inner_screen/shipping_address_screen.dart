@@ -16,16 +16,41 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   late String pinCode;
-
   late String locality;
-
   late String city;
-
   late String state;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch and set initial values for text fields
+    fetchUserAddress();
+  }
+
+  Future<void> fetchUserAddress() async {
+    try {
+      // Fetch user's address from Firestore
+      DocumentSnapshot userSnapshot = await _firestore
+          .collection('users')
+          .doc(_auth.currentUser!.uid)
+          .get();
+
+      // If user's address is present, set initial values for text fields
+      if (userSnapshot.exists) {
+        setState(() {
+          pinCode = userSnapshot['pinCode'] ?? '';
+          locality = userSnapshot['locality'] ?? '';
+          city = userSnapshot['city'] ?? '';
+          state = userSnapshot['state'] ?? '';
+        });
+      }
+    } catch (e) {
+      print("Error fetching user address: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,8 +95,22 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                   SizedBox(
                     height: 20,
                   ),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
+                      child: Text(
+                        'Pin Code',
+                        style: GoogleFonts.getFont(
+                          'Nunito Sans',
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                  ),
                   CustomTextField(
-                    label: 'Pin Code',
+                    label: 'Enter Your Pin Code',
                     prefixIcon: Icon(null),
                     text: 'Enter pin code',
                     validator: (value) {
@@ -88,8 +127,22 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                   SizedBox(
                     height: 20,
                   ),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
+                      child: Text(
+                        'Locality',
+                        style: GoogleFonts.getFont(
+                          'Nunito Sans',
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                  ),
                   CustomTextField(
-                    label: 'Locality',
+                    label: 'Enter Your Locality',
                     prefixIcon: Icon(null),
                     text: 'Enter locality',
                     validator: (value) {
@@ -106,8 +159,22 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                   SizedBox(
                     height: 20,
                   ),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
+                      child: Text(
+                        'City',
+                        style: GoogleFonts.getFont(
+                          'Nunito Sans',
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                  ),
                   CustomTextField(
-                    label: 'City',
+                    label: 'Enter Your City',
                     prefixIcon: Icon(null),
                     text: 'Enter city',
                     validator: (value) {
@@ -124,8 +191,22 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                   SizedBox(
                     height: 20,
                   ),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
+                      child: Text(
+                        'State',
+                        style: GoogleFonts.getFont(
+                          'Nunito Sans',
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                  ),
                   CustomTextField(
-                    label: 'State',
+                    label: 'Enter Your State',
                     prefixIcon: Icon(null),
                     text: 'Enter state',
                     validator: (value) {
@@ -144,7 +225,6 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                   ),
                   ButtonWidgets(
                     isLoading: false,
-                   
                     buttonChange: () async {
                       if (_formKey.currentState!.validate()) {
                         _showLoginDialog(context);

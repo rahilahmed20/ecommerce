@@ -1,19 +1,16 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:macstore/provider/product_provider.dart';
 import 'package:macstore/views/screens/inner_screen/shipping_address_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
 import 'package:uuid/uuid.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
+import 'package:macstore/utilities/send_mail.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   @override
@@ -26,78 +23,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   bool _isLoading = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Map<String, dynamic>? paymentIntentData;
-
-  displayPaymentSheet(dynamic data) async {
-    // showProgress();
-    for (var item in ref.read(cartProvider.notifier).getCartItems.values) {
-      // if (_auth.currentUser == null) {
-      //   // Access _auth.currentUser properties safely
-      //   print("user is not present");
-      // }
-
-      // DocumentSnapshot userDoc = await _firestore
-      //     .collection('buyers')
-      //     .doc(_auth.currentUser!.uid)
-      //     .get();
-
-      if (_auth.currentUser != null) {
-        DocumentSnapshot userDoc = await _firestore
-            .collection('buyers')
-            .doc(_auth.currentUser!.uid)
-            .get();
-        // Rest of your code that uses userDoc
-        CollectionReference orderRef =
-            FirebaseFirestore.instance.collection('orders');
-        final orderId = const Uuid().v4();
-        await orderRef.doc(orderId).set({
-          'orderId': orderId,
-          'productName': item.productName,
-          'productId': item.productId,
-          'size': item.productSize,
-          'quantity': item.quantity,
-          'price': item.quantity * item.productPrice,
-          'productCategory': item.catgoryName,
-          'productImage': item.imageUrl[0],
-          'state': state,
-          'locality': locality,
-          'pinCode': pinCode,
-          'city': city,
-          'fullName': (userDoc.data() as Map<String, dynamic>)['fullName'],
-          'email': (userDoc.data() as Map<String, dynamic>)['email'],
-          'buyerId': _auth.currentUser!.uid,
-          "deliveredCount": 0,
-          "delivered": false,
-          "processing": true,
-        }).whenComplete(() async {
-          await FirebaseFirestore.instance.runTransaction((transaction) async {
-            DocumentReference documentReference = FirebaseFirestore.instance
-                .collection('products')
-                .doc(item.productId);
-            DocumentSnapshot snapshot2 =
-                await transaction.get(documentReference);
-            transaction.update(documentReference,
-                {'instock': snapshot2['instock'] - item.quantity});
-          });
-        });
-      } else {
-        // Handle the case where _auth.currentUser is null
-        print("User is not present");
-      }
-      await _firestore.collection('products').doc(item.productId).update({
-        'salesCount': FieldValue.increment(item.quantity.toDouble()),
-      });
-    }
-    await Future.delayed(const Duration(microseconds: 100)).whenComplete(() {
-      //clear
-      // context.read<Cart>().clearCart();
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return MainScreen();
-      }));
-    });
-  }
-
   String? selectedPaymentOption = "";
+  String orderId = '';
 
   // Variables to store user data
   String pinCode = '';
@@ -480,7 +407,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           onChanged: (value) {
                             setState(() {
                               selectedPaymentOption = value;
-                              print(selectedPaymentOption);
                             });
                           },
                           activeColor: const Color(0xFF5C69E5),
@@ -708,14 +634,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 .doc(_auth.currentUser!.uid)
                 .get();
 
-            if (selectedPaymentOption == 'CashOnDelivery') {
-              // Save order details and update sales count in the product collection
-              await Future.forEach(_cartProvider.getCartItems.entries,
-                  (entry) async {
-                final orderId = Uuid().v4();
+            // Save order details and update sales count in the product collection
+            await Future.forEach(
+              _cartProvider.getCartItems.entries,
+              (entry) async {
+                orderId = Uuid().v4();
                 var item = entry.value;
-
-                // Update the sales count for the product
 
                 // Save order details
                 await _firestore.collection('orders').doc(orderId).set({
@@ -738,27 +662,27 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   "deliveredCount": 0,
                   "delivered": false,
                   "processing": true,
+                  "mode": selectedPaymentOption,
+                  "timestamp": FieldValue.serverTimestamp(),
                 });
-              }).whenComplete(() {
-                setState(() async {
-                  _isLoading = false;
-                  _cartProvider.getCartItems.clear();
-                  DocumentSnapshot userDoc = await _firestore
-                      .collection('buyers')
-                      .doc(_auth.currentUser!.uid)
-                      .get();
-                  String buyerEmail =
-                      (userDoc.data() as Map<String, dynamic>)['email'];
+
+                if (selectedPaymentOption == 'CashOnDelivery') {
+                  // Send order notification with orderId
                   sendOrderNotification(
-                      buyerEmail, "shaikhwasiullah500@gmail.com");
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return MainScreen();
-                  }));
-                });
+                      "shaikhwasiullah500@gmail.com", orderId, false);
+                } else {
+                  makePayment(totalAmount);
+                }
+              },
+            ).whenComplete(() {
+              setState(() {
+                _isLoading = false;
+                _cartProvider.getCartItems.clear();
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return MainScreen();
+                }));
               });
-            } else {
-              makePayment(totalAmount);
-            }
+            });
           },
           child: Container(
             width: 338,
@@ -791,32 +715,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    // sendOrderNotification('21co37@aiktc.ac.in');
-    DocumentSnapshot userDoc =
-        await _firestore.collection('buyers').doc(_auth.currentUser!.uid).get();
-    String buyerEmail = (userDoc.data() as Map<String, dynamic>)['email'];
-    print('buyerEmail is --> $buyerEmail');
-    sendOrderNotification(buyerEmail, "shaikhwasiullah500@gmail.com");
-  }
-
-  void sendOrderNotification(String buyerEmail, String adminEmail) async {
-    final smtpServer = gmail('rahilahmed1720@gmail.com',
-        'imoj ervd kkye ronk'); // Update with your email and password or app-specific password
-
-    final message = Message()
-      ..from = Address(buyerEmail, 'Ghar Ka Bazaar')
-      ..recipients.add(adminEmail) // Admin's email
-      ..subject = 'New Order Placed'
-      ..text = 'A new order has been placed. Check the dashboard for details.';
-
-    try {
-      final sendReport = await send(message, smtpServer);
-      print('Mail send Successfully');
-      print('Message sent: ' + sendReport.toString());
-    } catch (e) {
-      print('Something went wrong while sending mail');
-      print('Error sending email: $e');
-    }
+    sendOrderNotification('shaikhwasiullah500@gmail.com', orderId, false);
+    Get.snackbar('Success', 'Payment Successfully Done',
+        colorText: Colors.green);
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {

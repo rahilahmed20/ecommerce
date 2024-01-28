@@ -18,6 +18,7 @@ import 'package:macstore/views/screens/inner_screen/order_screen.dart';
 import 'package:macstore/views/screens/inner_screen/shipping_address_screen.dart';
 import 'package:macstore/views/screens/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../vendor/authentication/logout_confirmation_modal.dart';
 
@@ -692,6 +693,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               height: 10,
             ),
             ListTile(
+              onTap: () {
+                sendMessageOnWhatsapp();
+              },
               leading: Image.asset('assets/icons/help.png'),
               title: Text(
                 'Help ',
@@ -720,5 +724,20 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
         ),
       ),
     );
+  }
+
+  static Future<void> sendMessageOnWhatsapp() async {
+    final number = "+919372952412";
+    final message = "Hello to Ghar ka Bazar";
+    final urlString =
+        'https://wa.me/$number?text=${Uri.encodeComponent(message)}';
+
+    final uri = Uri.parse(urlString); // Create Uri object from String
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Could not launch $urlString';
+    }
   }
 }

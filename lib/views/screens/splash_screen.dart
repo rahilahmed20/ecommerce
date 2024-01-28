@@ -16,7 +16,7 @@ class SplashScreen extends StatefulWidget {
 
 class SplashScreenState extends State<SplashScreen> {
   static const String KEYLOGIN = "login";
-  late Widget nextScreen;
+  late Widget nextScreen = LoginScreen();
 
   @override
   void initState() {

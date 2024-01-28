@@ -3,8 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/views/screens/inner_screen/order_detail_screen.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server/gmail.dart';
+import 'package:macstore/utilities/send_mail.dart';
 
 class OrderScreen extends StatelessWidget {
   const OrderScreen({super.key});
@@ -346,10 +345,9 @@ class OrderScreen extends StatelessWidget {
                                               'delivered': false
                                             }).then((_) {
                                               sendOrderNotification(
-                                                orderData['email'],
-                                                "shaikhwasiullah500@gmail.com",
-                                                orderData.id,
-                                              );
+                                                  "shaikhwasiullah500@gmail.com",
+                                                  orderData.id,
+                                                  true);
                                             }).catchError((error) {
                                               print(
                                                   'Failed to update order: $error');
@@ -376,49 +374,5 @@ class OrderScreen extends StatelessWidget {
                 }));
           },
         ));
-  }
-
-  void sendOrderNotification(
-      String buyerEmail, String adminEmail, String orderId) async {
-    final smtpServer = gmail('rahilahmed1720@gmail.com', 'imoj ervd kkye ronk');
-
-    try {
-      // Fetch order data using the orderId
-      DocumentSnapshot orderSnapshot = await FirebaseFirestore.instance
-          .collection('orders')
-          .doc(orderId)
-          .get();
-
-      if (orderSnapshot.exists) {
-        Map<String, dynamic> orderData =
-            orderSnapshot.data() as Map<String, dynamic>;
-
-        final message = Message()
-          ..from = Address('rahilahmed1720@gmail.com', 'Ghar Ka Bazaar')
-          ..recipients.add(buyerEmail) // Buyer's email
-          ..recipients.add(adminEmail) // Admin's email
-          ..subject = 'Order Cancelled'
-          ..html = '''
-        <h3>Your order has been cancelled.</h3>
-        <p>Order Details:</p>
-        <ul>
-          <li>Product Name: ${orderData['productName']}</li>
-          <li>Product Category: ${orderData['productCategory']}</li>
-          <li>Size: ${orderData['size']}</li>
-          <!-- Add more order details as needed -->
-        </ul>
-        <p>For further assistance, contact support.</p>
-      ''';
-
-        final sendReport = await send(message, smtpServer);
-        print('Mail sent Successfully');
-        print('Message sent: ' + sendReport.toString());
-      } else {
-        print('Order document does not exist');
-      }
-    } catch (e) {
-      print('Something went wrong while fetching or sending mail');
-      print('Error: $e');
-    }
   }
 }

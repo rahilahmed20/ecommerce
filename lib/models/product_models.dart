@@ -19,5 +19,6 @@ class CartModel {
       required this.productId,
       required this.productSize,
       required this.discount,
-      required this.description, required this.storeId});
+      required this.description,
+      required this.storeId});
 }

@@ -34,7 +34,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
     try {
       // Fetch user's address from Firestore
       DocumentSnapshot userSnapshot = await _firestore
-          .collection('users')
+          .collection('buyers')
           .doc(_auth.currentUser!.uid)
           .get();
 
@@ -100,7 +100,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
                       child: Text(
-                        'Pin Code',
+                        'Address Line 1',
                         style: GoogleFonts.getFont(
                           'Nunito Sans',
                           fontWeight: FontWeight.w600,
@@ -110,12 +110,12 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                     ),
                   ),
                   CustomTextField(
-                    label: 'Enter Your Pin Code',
+                    label: 'Pls enter your correct address',
                     prefixIcon: Icon(null),
-                    text: 'Enter pin code',
+                    text: 'Pls enter your correct address',
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Enter Pin Code";
+                        return "Enter Address";
                       } else {
                         return null;
                       }
@@ -132,7 +132,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
                       child: Text(
-                        'Locality',
+                        'Address Line 2',
                         style: GoogleFonts.getFont(
                           'Nunito Sans',
                           fontWeight: FontWeight.w600,
@@ -142,12 +142,12 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                     ),
                   ),
                   CustomTextField(
-                    label: 'Enter Your Locality',
+                    label: 'pls enter your nearby famous locations',
                     prefixIcon: Icon(null),
-                    text: 'Enter locality',
+                    text: 'Enter Near by famous location',
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Enter  Locality";
+                        return "Enter Nearby Locality";
                       } else {
                         return null;
                       }
@@ -164,7 +164,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
                       child: Text(
-                        'City',
+                        'City and Pincode',
                         style: GoogleFonts.getFont(
                           'Nunito Sans',
                           fontWeight: FontWeight.w600,
@@ -174,12 +174,12 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                     ),
                   ),
                   CustomTextField(
-                    label: 'Enter Your City',
+                    label: 'pls enter your city and pincode',
                     prefixIcon: Icon(null),
-                    text: 'Enter city',
+                    text: 'pls enter your city and pincode',
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Enter City";
+                        return "Enter City and Pincode";
                       } else {
                         return null;
                       }
@@ -223,22 +223,71 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                   SizedBox(
                     height: 20,
                   ),
+                  // Align(
+                  //   alignment: Alignment.topLeft,
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
+                  //     child: Text(
+                  //       'Contact No',
+                  //       style: GoogleFonts.getFont(
+                  //         'Nunito Sans',
+                  //         fontWeight: FontWeight.w600,
+                  //         letterSpacing: 0.2,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // CustomTextField(
+                  //   label: 'pls add contact no',
+                  //   prefixIcon: Icon(null),
+                  //   text: 'pls provide contact no ',
+                  //   validator: (value) {
+                  //     if (value!.isEmpty) {
+                  //       return "Enter Contact no";
+                  //     } else {
+                  //       return null;
+                  //     }
+                  //   },
+                  //   onChanged: (value) {
+                  //     contactNo = value;
+                  //   },
+                  // ),
                   ButtonWidgets(
                     isLoading: false,
                     buttonChange: () async {
                       if (_formKey.currentState!.validate()) {
-                        _showLoginDialog(context);
-                        await _firestore
-                            .collection('users')
-                            .doc(_auth.currentUser!.uid)
-                            .update({
-                          "pinCode": pinCode,
-                          'locality': locality,
-                          'city': city,
-                          'state': state,
-                        }).whenComplete(() {
-                          Navigator.pop(context);
-                        });
+                        if (pinCode.isNotEmpty &&
+                            locality.isNotEmpty &&
+                            city.isNotEmpty &&
+                            state.isNotEmpty) {
+                          _showLoginDialog(context);
+                          await _firestore
+                              .collection('buyers')
+                              .doc(_auth.currentUser!.uid)
+                              .update({
+                            "pinCode": pinCode,
+                            'locality': locality,
+                            'city': city,
+                            'state': state,
+                          }).whenComplete(() {
+                            Navigator.pop(context, {'addressFilled': true});
+                            // Navigate to the payment screen or perform the next step
+                            // For example:
+                            // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                            //   return PaymentScreen();
+                            // }));
+                          });
+                        } else {
+                          // Show a message to the user indicating that they need to fill in the address details first
+                          Navigator.pop(context, {'addressFilled': false});
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Please fill in all address details before proceeding.'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
                       }
                     },
                     buttonTitle: 'Go to Payment',

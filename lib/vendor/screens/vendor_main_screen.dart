@@ -24,6 +24,7 @@ class _vendorMainScreenState extends State<vendorMainScreen> {
     VendorAccountScreen(),
   ];
   int pageIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

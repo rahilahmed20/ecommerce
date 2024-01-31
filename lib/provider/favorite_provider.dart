@@ -28,21 +28,21 @@ class FavoriteNotifier extends StateNotifier<Map<String, FavoriteModel>> {
       discountPrice: discountPrice,
     );
 
-    ///notify listeners that the state has changed
+    // notify listeners that the state has changed
     state = {...state};
   }
 
   void removeAllItems() {
     state.clear();
 
-    ///notify listeners that the state has changed
+    // notify listeners that the state has changed
     state = {...state};
   }
 
   void removeItem(String productId) {
     state.remove(productId);
 
-    ///notify listeners that the state has changed
+    // notify listeners that the state has changed
     state = {...state};
   }
 

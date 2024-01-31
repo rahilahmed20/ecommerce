@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:macstore/views/screens/inner_screen/order_placed_screen.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:macstore/provider/product_provider.dart';
 import 'package:macstore/views/screens/inner_screen/shipping_address_screen.dart';
-import 'package:macstore/views/screens/main_screen.dart';
 import 'package:uuid/uuid.dart';
 import 'package:macstore/utilities/send_mail.dart';
+import 'package:intl/intl.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   @override
@@ -25,11 +26,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   String? selectedPaymentOption = "";
   String orderId = '';
 
+  bool isAddressFilled() {
+    return pinCode.isNotEmpty &&
+        locality.isNotEmpty &&
+        city.isNotEmpty &&
+        state.isNotEmpty;
+  }
+
   // Variables to store user data
   String pinCode = '';
   String locality = '';
   String city = '';
   String state = '';
+  String phoneNumber = '';
 
   @override
   void initState() {
@@ -55,6 +64,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           locality = userData.get('locality') ?? '';
           city = userData.get('city') ?? '';
           state = userData.get('state') ?? '';
+          phoneNumber = userData.get('phoneNumber') ?? '';
         });
       }
     });
@@ -62,9 +72,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final _cartProvider = ref.read(cartProvider.notifier);
-
     final cartData = ref.watch(cartProvider);
+
     final totalAmount = ref.read(cartProvider.notifier).calculateTotalAmount();
     double total = totalAmount + 10;
     return Scaffold(
@@ -136,12 +145,32 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       InkWell(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                              MaterialPageRoute(
+                                        onTap: () async {
+                                          final result = await Navigator.push(
+                                              context, MaterialPageRoute(
                                                   builder: (context) {
                                             return ShippingAddressScreen();
                                           }));
+                                          if (result != null &&
+                                              result['addressFilled']) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'Proceed for payment.'),
+                                                duration: Duration(seconds: 2),
+                                              ),
+                                            );
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'Please fill in all address details to proceed.'),
+                                                duration: Duration(seconds: 2),
+                                              ),
+                                            );
+                                          }
                                         },
                                         child: Align(
                                           alignment: Alignment.centerLeft,
@@ -600,60 +629,50 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         padding: const EdgeInsets.all(8.0),
         child: InkWell(
           onTap: () async {
-            DocumentSnapshot userDoc = await _firestore
-                .collection('buyers')
-                .doc(_auth.currentUser!.uid)
-                .get();
+            if (!isAddressFilled()) {
+              // If address details are not filled, show a reminder
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content:
+                      Text('Please fill in all address details to proceed.'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+              return;
+            }
+            try {
+              // Generate a single order ID for the entire order
+              setState(() {
+                _isLoading = true;
+              });
+              orderId = Uuid().v4();
 
-            // Save order details and update sales count in the product collection
-            await Future.forEach(
-              _cartProvider.getCartItems.entries,
-              (entry) async {
-                orderId = Uuid().v4();
-                var item = entry.value;
+              if (selectedPaymentOption == 'CashOnDelivery') {
+                // Additional logic for Cash on Delivery
+                // Save order details with the common order ID
+                await saveOrderDetails();
+                // Send order notification with orderId
+                sendOrderNotification(
+                    "shaikhwasiullah500@gmail.com", orderId, false);
 
-                // Save order details
-                await _firestore.collection('orders').doc(orderId).set({
-                  'orderId': orderId,
-                  'productName': item.productName,
-                  'productId': item.productId,
-                  'size': item.productSize,
-                  'quantity': item.quantity,
-                  'price': item.quantity * item.productPrice,
-                  'productCategory': item.catgoryName,
-                  'productImage': item.imageUrl[0],
-                  'state': state,
-                  'locality': locality,
-                  'pinCode': pinCode,
-                  'city': city,
-                  'fullName':
-                      (userDoc.data() as Map<String, dynamic>)['fullName'],
-                  'email': (userDoc.data() as Map<String, dynamic>)['email'],
-                  'buyerId': _auth.currentUser!.uid,
-                  "deliveredCount": 0,
-                  "delivered": false,
-                  "processing": true,
-                  "mode": selectedPaymentOption,
-                  "timestamp": FieldValue.serverTimestamp(),
-                });
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => OrderPlacedScreen()),
+                );
+              } else {
+                // Additional logic for Online Payment
+                // Make the online payment
+                makePayment(totalAmount);
+              }
+            } catch (error) {
+              print('Error saving orders: $error');
+            } finally {
+              // Set loading back to false after processing
 
-                if (selectedPaymentOption == 'CashOnDelivery') {
-                  // Send order notification with orderId
-                  sendOrderNotification(
-                      "shaikhwasiullah500@gmail.com", orderId, false);
-                } else {
-                  makePayment(totalAmount);
-                }
-              },
-            ).whenComplete(() {
               setState(() {
                 _isLoading = false;
-                _cartProvider.getCartItems.clear();
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return MainScreen();
-                }));
               });
-            });
+            }
           },
           child: Container(
             width: 338,
@@ -685,14 +704,87 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
+  Future<void> saveOrderDetails() async {
+    DateTime now = DateTime.now();
+    // String formattedTimestamp = DateFormat('dd-MM-yyyy hh:mm a').format(now);
+    String formattedTimestamp =
+        DateFormat('dd MMMM yyyy ' 'at' ' hh:mm:ss a z').format(now);
+
+    final _cartProvider = ref.read(cartProvider.notifier);
+
+    final totalAmount = ref.read(cartProvider.notifier).calculateTotalAmount();
+    double total = totalAmount + 10;
+    DocumentSnapshot userDoc =
+        await _firestore.collection('buyers').doc(_auth.currentUser!.uid).get();
+
+    List<Map<String, dynamic>> orderItems = [];
+
+    // Build the list of order items
+    if (_cartProvider.getCartItems != null) {
+      for (var entry in _cartProvider.getCartItems.entries) {
+        var item = entry.value;
+
+        orderItems.add({
+          'productName': item.productName,
+          'productId': item.productId,
+          'size': item.productSize,
+          'quantity': item.quantity,
+          'productCategory': item.catgoryName,
+          'productImage': item.imageUrl[0],
+        });
+      }
+    }
+
+    try {
+      // Save order details with the list of items
+      await _firestore.collection('orders').doc(orderId).set({
+        'orderId': orderId,
+        'items': orderItems,
+        'price': total,
+        'state': state,
+        'locality': locality,
+        'pinCode': pinCode,
+        'city': city,
+        'fullName': (userDoc.data() as Map<String, dynamic>)['fullName'],
+        'email': (userDoc.data() as Map<String, dynamic>)['email'],
+        'phoneNumber': (userDoc.data() as Map<String, dynamic>)['phoneNumber'],
+        'buyerId': _auth.currentUser!.uid,
+        "deliveredCount": 0,
+        "delivered": false,
+        "processing": true,
+        "mode": selectedPaymentOption,
+        'timestamp': formattedTimestamp,
+        // ... (other order details)
+      });
+    } catch (error) {
+      print('Error saving order details: $error');
+      // Handle the error as needed (e.g., show a user-friendly message)
+    }
+  }
+
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    sendOrderNotification('shaikhwasiullah500@gmail.com', orderId, false);
-    Get.snackbar('Success', 'Payment Successfully Done',
-        colorText: Colors.green);
+    try {
+      // Save order details with the common order ID
+      await saveOrderDetails();
+      sendOrderNotification('shaikhwasiullah500@gmail.com', orderId, false);
+      Get.snackbar('Success', 'Payment Successfully Done',
+          colorText: Colors.green);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => OrderPlacedScreen()),
+      );
+      // Additional logic for successful payment
+      sendOrderNotification('shaikhwasiullah500@gmail.com', orderId, false);
+      Get.snackbar('Success', 'Payment Successfully Done',
+          colorText: Colors.green);
+    } catch (error) {
+      print('Error saving orders after payment success: $error');
+    }
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     // Do something when payment fails
+    Get.snackbar('Failure', '${response.error}', colorText: Colors.green);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {

@@ -18,7 +18,7 @@ class VendorAccountScreen extends StatefulWidget {
 
 class _VendorAccountScreenState extends State<VendorAccountScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   void _showLogoutConfirmationDialog() async {
     bool confirmLogout = await showDialog(
       context: context,

@@ -256,9 +256,11 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     ordersDataStream.listen((QuerySnapshot querySnapshot) {
       for (QueryDocumentSnapshot document in querySnapshot.docs) {
         if (document.exists) {
-          setState(() {
-            deliveredCount = document.get('deliveredCount');
-          });
+          if (mounted) {
+            setState(() {
+              deliveredCount = document.get('deliveredCount');
+            });
+          }
         }
       }
     });
@@ -653,9 +655,14 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               height: 10,
             ),
             ListTile(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return TermsAndConditionsScreen();
+                }));
+              },
               leading: Image.asset('assets/icons/history.png'),
               title: Text(
-                'History ',
+                'Terms and Conditions ',
                 style: GoogleFonts.lato(
                   fontWeight: FontWeight.bold,
                 ),
@@ -739,5 +746,73 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     } else {
       throw 'Could not launch $urlString';
     }
+  }
+}
+
+class TermsAndConditionsScreen extends StatefulWidget {
+  @override
+  _TermsAndConditionsScreenState createState() =>
+      _TermsAndConditionsScreenState();
+}
+
+class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool acceptedTerms = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Terms and Conditions'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Welcome to our Ghar Ka Bazar Ecommerce Platform!\n\n'
+                'Developed by Awrim Technologies'
+                'By using this platform, you agree to the following terms and conditions:\n\n'
+                '1. This platform is designed for individual buyers to sell necessary products directly to customers.\n\n'
+                '2. Buyers must ensure that the products listed comply with all relevant laws and regulations.\n\n'
+                '3. The platform reserves the right to remove any product listings that violate our policies.\n\n'
+                '4. Buyers are responsible for accurate product descriptions, prices, and timely order fulfillment.\n\n'
+                '5. Users must respect each other and engage in fair and ethical business practices.\n\n'
+                '6. Any fraudulent activities, misuse, or violation of terms may result in account suspension.\n\n'
+                '7. Buyers must provide accurate and up-to-date information in their profiles.\n\n'
+                '8. Customers have the right to leave reviews and ratings based on their experience.\n\n'
+                'By accepting these terms, you acknowledge your commitment to providing a positive and trustworthy experience for customers.',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+          CheckboxListTile(
+            title: Text('I accept the terms and conditions'),
+            value: acceptedTerms,
+            onChanged: (value) {
+              setState(() {
+                acceptedTerms = value ?? false;
+              });
+            },
+          ),
+          ElevatedButton(
+            onPressed: () {
+              saveTermsAndConditionsToFirestore(acceptedTerms);
+              Navigator.pop(context);
+            },
+            child: Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void saveTermsAndConditionsToFirestore(bool accepted) {
+    // Save the accepted value to the Firestore collection 'buyers'
+    _firestore.collection('buyers').doc(_auth.currentUser!.uid).update({
+      'acceptedTerms': accepted,
+    });
   }
 }

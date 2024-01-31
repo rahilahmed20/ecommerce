@@ -33,7 +33,7 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
           productSize: state[productId]!.productSize,
           discount: state[productId]!.discount,
           description: state[productId]!.description,
-          storeId:  state[storeId]!.storeId,
+          storeId: state[storeId]!.storeId,
         )
       };
     } else {
@@ -59,8 +59,7 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
     if (state.containsKey(productId)) {
       state[productId]!.quantity--;
 
-      ///notify listeners that the state has changed
-      ///
+      // notify listeners that the state has changed
       state = {...state};
     }
   }
@@ -75,8 +74,7 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
     if (state.containsKey(productId)) {
       state[productId]!.quantity++;
 
-      ///notify listeners that the state has changed
-      ///
+      // notify listeners that the state has changed
       state = {...state};
     }
   }

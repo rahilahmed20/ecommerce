@@ -8,8 +8,6 @@ import 'package:macstore/views/screens/authentication_screens/register_screen.da
 import 'package:macstore/views/screens/widgets/button_widget.dart';
 import 'package:macstore/views/screens/widgets/custom_text_Field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../views/screens/main_screen.dart';
 import '../../views/screens/splash_screen.dart';
 
 class VendorLoginScreen extends StatefulWidget {

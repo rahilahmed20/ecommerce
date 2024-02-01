@@ -23,6 +23,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
   late ValueNotifier<String> descriptionNotifier;
   bool showFullDescription = false;
   int imageIndex = 0;
+  int qty = 1;
 
   @override
   void initState() {
@@ -208,18 +209,18 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                           Text('(299)'),
 
                           // Original Rating Code
-                          if (widget.productData != null &&
-                              widget.productData.data().containsKey('rating'))
-                            widget.productData['rating'] == 0
-                                ? Text("")
-                                : Text(
-                                    widget.productData['rating'].toString(),
-                                    style: TextStyle(
-                                      color: Color(0xFF7F8E9D),
-                                      fontSize: 12,
-                                      fontFamily: 'Lato',
-                                    ),
-                                  ),
+                          // if (widget.productData != null &&
+                          //     widget.productData.data().containsKey('rating'))
+                          //   widget.productData['rating'] == 0
+                          //       ? Text("")
+                          //       : Text(
+                          //           widget.productData['rating'].toString(),
+                          //           style: TextStyle(
+                          //             color: Color(0xFF7F8E9D),
+                          //             fontSize: 12,
+                          //             fontFamily: 'Lato',
+                          //           ),
+                          //         ),
                         ],
                       ),
 
@@ -362,6 +363,79 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                                     size: 18,
                                   )
                               ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Quantity
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Quantity :',
+                          style: GoogleFonts.getFont(
+                            'Lato',
+                            color: const Color(0xFF343434),
+                            fontSize: 16,
+                            height: 1.6,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            if (qty > 1) {
+                              _cartProvider.decrementItem(
+                                  widget.productData['productId']);
+                              setState(() {
+                                qty--;
+                              });
+                            }
+                          },
+                          icon: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Icon(
+                              Icons.remove,
+                              size: 20,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+
+                        // Quantity Text
+                        Text(
+                          qty.toString(),
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+
+                        // Add Button
+                        IconButton(
+                          onPressed: () {
+                            _cartProvider
+                                .incrementItem(widget.productData['productId']);
+                            setState(() {
+                              qty++;
+                            });
+                          },
+                          icon: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF3C55EF),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              size: 20,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -572,7 +646,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                     productPrice: widget.productData['price'],
                     catgoryName: widget.productData['category'],
                     imageUrl: widget.productData['productImages'],
-                    quantity: 1,
+                    quantity: qty,
                     productId: widget.productData['productId'],
                     productSize: (widget.productData['productSize'].isEmpty)
                         ? ''

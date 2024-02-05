@@ -51,6 +51,8 @@ class VendorController extends GetxController {
         'address': address,
         'companyId': companyId,
         'categoryName': '',
+        'cartItems': [],
+        'favouriteProducts': [],
         'description': '',
       });
 

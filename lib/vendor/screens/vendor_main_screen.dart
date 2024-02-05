@@ -17,7 +17,7 @@ class vendorMainScreen extends StatefulWidget {
 class _vendorMainScreenState extends State<vendorMainScreen> {
   List<Widget> _pages = [
     HomeScreen(),
-    StoresScreen(),
+    // StoresScreen(),
     CartScreenProduct(),
     ProductUploadPage(),
     VendorOrderScreen(),
@@ -36,7 +36,7 @@ class _vendorMainScreenState extends State<vendorMainScreen> {
         },
         currentIndex: pageIndex,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.purple,
+        selectedItemColor: Color(0xFF3C55EF),
         unselectedItemColor: Colors.grey,
         items: [
           BottomNavigationBarItem(
@@ -44,37 +44,40 @@ class _vendorMainScreenState extends State<vendorMainScreen> {
             icon: Image.asset(
               'assets/icons/home.png',
               width: 25,
+              color: pageIndex == 0 ? Color(0xFF3C55EF) : Colors.grey,
             ),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            backgroundColor: Colors.white.withOpacity(0.95),
-            icon: Image.asset(
-              'assets/icons/mart.png',
-              width: 25,
-            ),
-            label: 'Stores',
-          ),
+          // BottomNavigationBarItem(
+          //   backgroundColor: Colors.white.withOpacity(0.95),
+          //   icon: Image.asset(
+          //     'assets/icons/mart.png',
+          //     width: 25,
+          //     color: pageIndex == 1 ? Color(0xFF3C55EF) : Colors.grey,
+          //   ),
+          //   label: 'Stores',
+          // ),
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/cart.png',
               width: 25,
+              color: pageIndex == 1 ? Color(0xFF3C55EF) : Colors.grey,
             ),
             label: 'Cart',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.edit),
+            icon: Icon(Icons.edit,
+                color: pageIndex == 2 ? Color(0xFF3C55EF) : Colors.grey),
             label: 'Upload',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/orders.png',
-              width: 40,
-            ),
+            icon: Icon(Icons.receipt_long_outlined,
+                color: pageIndex == 3 ? Color(0xFF3C55EF) : Colors.grey),
             label: 'Orders',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.money_dollar),
+            icon: Icon(CupertinoIcons.money_dollar,
+                color: pageIndex == 4 ? Color(0xFF3C55EF) : Colors.grey),
             label: 'Account',
           ),
         ],

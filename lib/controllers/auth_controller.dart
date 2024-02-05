@@ -37,6 +37,8 @@ class AuthController extends GetxController {
         'locality': "",
         'city': '',
         'state': '',
+        'cartItems': [],
+        'favouriteProducts': [],
       });
 
       res = 'success';

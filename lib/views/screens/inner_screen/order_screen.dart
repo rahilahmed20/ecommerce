@@ -1,12 +1,14 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/views/screens/inner_screen/order_detail_screen.dart';
-import 'package:macstore/utilities/send_mail.dart';
+
+import '../../../utilities/send_mail.dart';
 
 class OrderScreen extends StatelessWidget {
-  const OrderScreen({super.key});
+  const OrderScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,363 +18,339 @@ class OrderScreen extends StatelessWidget {
         .snapshots();
 
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize:
-              Size.fromHeight(MediaQuery.of(context).size.height * 0.20),
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: 118,
-            clipBehavior: Clip.hardEdge,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(
-                  'assets/icons/cartb.png',
-                ),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  left: 61,
-                  top: 51,
-                  child: Text(
-                    'My Orders',
-                    style: GoogleFonts.getFont(
-                      'Lato',
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 23,
-                  top: 54,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Icon(
-                      Icons.arrow_back_ios,
-                      size: 20,
-                      color: Colors.white,
-                    ),
-                  ),
-                )
-              ],
+      appBar: PreferredSize(
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.20),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: 118,
+          clipBehavior: Clip.hardEdge,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/icons/cartb.png'),
+              fit: BoxFit.cover,
             ),
           ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                left: 61,
+                top: 51,
+                child: Text(
+                  'My Orders',
+                  style: GoogleFonts.getFont(
+                    'Lato',
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 23,
+                top: 54,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
-        body: StreamBuilder<QuerySnapshot>(
-          stream: _ordersStream,
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return Text('Something went wrong');
-            }
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _ordersStream,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Something went wrong');
+          }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("Loading");
-            }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Text("Loading");
+          }
 
-            return ListView.builder(
-                itemCount: snapshot.data!.size,
-                itemBuilder: ((context, index) {
-                  final orderData = snapshot.data!.docs[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 25,
-                      vertical: 25,
+          final orders = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: orders.length,
+            itemBuilder: (context, index) {
+              final orderData = orders[index].data() as Map<String, dynamic>;
+              final items = orderData['items'] as List<dynamic>;
+
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return OrderDetail(
+                            orderData: orderData,
+                            items:
+                                items, // Pass the list of items // Pass the correct itemData
+                          );
+                        },
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.95,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: const Color(0xFFEFF0F2),
+                      ),
+                      borderRadius: BorderRadius.circular(9),
                     ),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return OrderDetail(
-                                orderData: orderData,
-                              );
-                            },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15, right: 15),
+                          child: Container(
+                            width: 77,
+                            height: 25,
+                            clipBehavior: Clip.antiAlias,
+                            decoration: BoxDecoration(
+                              color: orderData['delivered'] == true
+                                  ? const Color(0xFF3C55EF)
+                                  : orderData['processing'] == true
+                                      ? Colors.purple
+                                      : Colors.red,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Center(
+                              child: Text(
+                                orderData['delivered'] == true
+                                    ? "Delivered"
+                                    : orderData['processing'] == true
+                                        ? "Processing"
+                                        : 'Cancelled',
+                                style: GoogleFonts.getFont(
+                                  'Lato',
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
                           ),
-                        );
-                      },
-                      child: Container(
-                        width: 335,
-                        height: 153,
-                        clipBehavior: Clip.antiAlias,
-                        decoration: const BoxDecoration(),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Positioned(
-                                left: 0,
-                                top: 0,
-                                child: Container(
-                                  width: 336,
-                                  height: 154,
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                      color: const Color(0xFFEFF0F2),
+                        ),
+                        for (final item in items)
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Center(
+                                    child: Row(
+                                      children: [
+                                        Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            Image.network(
+                                              item['productImage'],
+                                              width: 70,
+                                              height: 60,
+                                              fit: BoxFit.contain,
+                                            )
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                    borderRadius: BorderRadius.circular(9),
                                   ),
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      Positioned(
-                                        left: 13,
-                                        top: 9,
-                                        child: Container(
-                                          width: 78,
-                                          height: 78,
-                                          clipBehavior: Clip.antiAlias,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: Text(
+                                              item['productName'],
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              style: GoogleFonts.getFont(
+                                                'Lato',
+                                                color: Colors.black,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
                                           ),
-                                          child: Stack(
-                                            clipBehavior: Clip.none,
-                                            children: [
-                                              Positioned(
-                                                left: 10,
-                                                top: 5,
-                                                child: Image.network(
-                                                  orderData['productImage'],
-                                                  width: 60,
-                                                  height: 90,
-                                                  fit: BoxFit.contain,
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              item['productCategory'],
+                                              style: GoogleFonts.getFont(
+                                                'Lato',
+                                                color: const Color(0xFF7F808C),
+                                                fontSize: 12,
+                                                height: 1.6,
+                                              ),
+                                            ),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Visibility(
+                                              visible: item['size'] != null &&
+                                                  item['size'].isNotEmpty,
+                                              child: Text(
+                                                'Size: ${item['size']}',
+                                                style: GoogleFonts.getFont(
+                                                  'Lato',
+                                                  color:
+                                                      const Color(0xFF7F808C),
+                                                  fontSize: 12,
+                                                  height: 1.6,
                                                 ),
-                                              )
-                                            ],
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              '\u{20B9}' +
+                                                  item['price'].toString(),
+                                              style: GoogleFonts.getFont(
+                                                'Lato',
+                                                color: const Color(0xFF0B0C1E),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                height: 1.3,
+                                              ),
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                      Positioned(
-                                        left: 101,
-                                        top: 14,
-                                        child: SizedBox(
-                                          width: 216,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: SizedBox(
-                                                  width: double.infinity,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      SizedBox(
-                                                        width: double.infinity,
-                                                        child: Text(
-                                                          orderData[
-                                                              'productName'],
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: GoogleFonts
-                                                              .getFont(
-                                                            'Lato',
-                                                            color: Colors.black,
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                top: 4),
-                                                      ),
-                                                      Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: Text(
-                                                          orderData[
-                                                              'productCategory'],
-                                                          style: GoogleFonts
-                                                              .getFont(
-                                                            'Lato',
-                                                            color: const Color(
-                                                                0xFF7F808C),
-                                                            fontSize: 12,
-                                                            height: 1.6,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                top: 2),
-                                                      ),
-                                                      Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: orderData['size']
-                                                                .toString()
-                                                                .isNotEmpty
-                                                            ? Text(
-                                                                'Size: ${orderData['size']}',
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .getFont(
-                                                                  'Lato',
-                                                                  color: const Color(
-                                                                      0xFF7F808C),
-                                                                  fontSize: 12,
-                                                                  height: 1.6,
-                                                                ),
-                                                              )
-                                                            : SizedBox.shrink(),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              const Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 10),
-                                              ),
-                                              Container(
-                                                height: 63,
-                                                alignment:
-                                                    const Alignment(0, -0.07),
-                                                child: Text(
-                                                  '\u{20B9}' +
-                                                      orderData['price']
-                                                          .toString(),
-                                                  style: GoogleFonts.getFont(
-                                                    'Lato',
-                                                    color:
-                                                        const Color(0xFF0B0C1E),
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                    height: 1.3,
-                                                  ),
-                                                ),
-                                              )
-                                            ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        const Divider(height: 2),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 25,
+                            vertical: 15,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'Total Price:',
+                                    style: GoogleFonts.getFont(
+                                      'Lato',
+                                      color: const Color(0xFF0B0C1E),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    '\u{20B9}' + orderData['price'].toString(),
+                                    style: GoogleFonts.getFont(
+                                      'Lato',
+                                      color: const Color(0xFF0B0C1E),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              CupertinoButton(
+                                onPressed: () {
+                                  orderData['processing']
+                                      ? FirebaseFirestore.instance
+                                          .collection('orders')
+                                          .doc(orderData['orderId'])
+                                          .update({
+                                          'delivered': false,
+                                          'processing': false
+                                        }).then((_) {
+                                          updateProductQuantities(orderData);
+                                          sendOrderNotification(
+                                              "shaikhwasiullah500@gmail.com",
+                                              orderData['orderId'],
+                                              true);
+                                        }).catchError((error) {
+                                          print(
+                                              'Failed to update order: $error');
+                                        })
+                                      : null;
+                                },
+                                child: orderData['processing']
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.red.withOpacity(0.9),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: Text(
+                                            'Cancel Order',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white),
                                           ),
                                         ),
                                       )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 0,
-                                top: 96,
-                                child: Image.network(
-                                  'https://storage.googleapis.com/codeless-dev.appspot.com/uploads%2Fimages%2Fnn2Ldqjoc2Xp89Y7Wfzf%2F0c22142f0880fed29e95291c0b438b13.png',
-                                  width: 335,
-                                  height: 1,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                              Positioned(
-                                left: 13,
-                                top: 113,
-                                child: Container(
-                                  width: 77,
-                                  height: 25,
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(
-                                    color: orderData['delivered'] == true
-                                        ? const Color(0xFF3C55EF)
-                                        : orderData['processing'] == true
-                                            ? Colors.purple
-                                            : Colors.red,
-                                    // color: const Color(0xFF3C55EF),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      Positioned(
-                                        left: 9,
-                                        top: 3,
-                                        child: Text(
-                                          orderData['delivered'] == true
-                                              ? "Delivered"
-                                              : orderData['processing'] == true
-                                                  ? "Processing"
-                                                  : 'Cancelled',
-                                          style: GoogleFonts.getFont(
-                                            'Lato',
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            height: 1.3,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 298,
-                                top: 115,
-                                child: Container(
-                                  width: 20,
-                                  height: 20,
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: const BoxDecoration(),
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      Positioned(
-                                        left: 0,
-                                        top: 0,
-                                        child: InkWell(
-                                          onTap: () {
-                                            FirebaseFirestore.instance
-                                                .collection('orders')
-                                                .doc(orderData.id)
-                                                .update({
-                                              'delivered': false
-                                            }).then((_) {
-                                              sendOrderNotification(
-                                                  "shaikhwasiullah500@gmail.com",
-                                                  orderData.id,
-                                                  true);
-                                            }).catchError((error) {
-                                              print(
-                                                  'Failed to update order: $error');
-                                            });
-                                          },
-                                          child: Image.asset(
-                                            'assets/icons/delete.png',
-                                            width: 20,
-                                            height: 20,
-                                            fit: BoxFit.contain,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
+                                    : Container(),
                               )
                             ],
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  );
-                }));
-          },
-        ));
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> updateProductQuantities(Map<String, dynamic> orderData) async {
+    final List<dynamic> products = orderData['items'];
+
+    for (final product in products) {
+      final productId = product['productId'];
+      final quantity = product['quantity'];
+
+      // Update the product quantity in Firestore
+      await FirebaseFirestore.instance
+          .collection('products')
+          .doc(productId)
+          .update({
+        'quantity': FieldValue.increment(quantity),
+      });
+    }
   }
 }

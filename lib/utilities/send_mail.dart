@@ -39,6 +39,8 @@ void sendOrderNotification(
 String getCancelledOrderHTML(
     List<dynamic> items, DocumentSnapshot orderSnapshot) {
   String productList = items.map((product) {
+    print('Product');
+    print(orderSnapshot['mode']);
     // Check if the product has a size
     String sizeInfo = '';
     if (product['size'] != null && product['size'].isNotEmpty) {
@@ -49,7 +51,7 @@ String getCancelledOrderHTML(
         <li><strong>Name:</strong> ${product['productName']}</li>
         <li><strong>Category:</strong> ${product['productCategory']}</li>
         $sizeInfo
-        <li><strong>Mode:</strong> ${product['mode']}</li>
+        <li><strong>Price:</strong> ${product['price']}</li>
         <hr style="border: 0; height: 1px; background-color: #ccc; margin: 10px 0;"/>
       ''';
   }).join('');
@@ -85,11 +87,10 @@ String getCancelledOrderHTML(
         </ul>
         <p><strong>Order ID:</strong> ${orderSnapshot['orderId']}</p>
         <p><strong>Email:</strong> ${orderSnapshot['email']}</p>
-        <p><strong>Address:</strong> ${orderSnapshot['pinCode'] + ' , ' +
-      orderSnapshot['locality'] + ' , ' + orderSnapshot['city'] + ' , ' +
-      orderSnapshot['state']}</p>
+        <p><strong>Address:</strong> ${orderSnapshot['pinCode'] + ' , ' + orderSnapshot['locality'] + ' , ' + orderSnapshot['city'] + ' , ' + orderSnapshot['state']}</p>
         <p><strong>Name:</strong> ${orderSnapshot['fullName']}</p>
         <p><strong>Phone Number:</strong> ${orderSnapshot['phoneNumber']}</p>
+        <p><strong>Payment Mode:</strong> ${orderSnapshot['mode']}</p>
         <p><strong>Total Price:</strong> ${orderSnapshot['price']}</p>
         <p><strong>Date:</strong> ${orderSnapshot['timestamp']}</p>
         <p>For further assistance, contact support.</p>
@@ -111,7 +112,7 @@ String getConfirmedOrderHTML(
         <li><strong>Name:</strong> ${product['productName']}</li>
         <li><strong>Category:</strong> ${product['productCategory']}</li>
         $sizeInfo
-        <li><strong>Payment Mode:</strong> ${product['mode']}</li>
+        <li><strong>Price:</strong> ${product['price']}</li>
         <hr style="border: 0; height: 1px; background-color: #ccc; margin: 10px 0;"/>
       ''';
   }).join('');
@@ -147,6 +148,7 @@ String getConfirmedOrderHTML(
         <p><strong>Address:</strong> ${orderSnapshot['pinCode'] + ' , ' + orderSnapshot['locality'] + ' , ' + orderSnapshot['city'] + ' , ' + orderSnapshot['state']}</p>
         <p><strong>Name:</strong> ${orderSnapshot['fullName']}</p>
         <p><strong>Phone Number:</strong> ${orderSnapshot['phoneNumber']}</p>
+        <p><strong>Payment Mode:</strong> ${orderSnapshot['mode']}</p>
         <p><strong>Total Price:</strong> ${orderSnapshot['price'].toString()}</p>
         <p><strong>Date:</strong> ${orderSnapshot['timestamp']}</p>
         <br>

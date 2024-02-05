@@ -11,7 +11,7 @@ final favoriteProvider =
 class FavoriteNotifier extends StateNotifier<Map<String, FavoriteModel>> {
   FavoriteNotifier() : super({});
 
-  void addProuctToFavorite({
+  void addProductToFavorite({
     required String productName,
     required String productId,
     required List imageUrl,
@@ -27,13 +27,6 @@ class FavoriteNotifier extends StateNotifier<Map<String, FavoriteModel>> {
       productSize: productSize,
       discountPrice: discountPrice,
     );
-
-    // notify listeners that the state has changed
-    state = {...state};
-  }
-
-  void removeAllItems() {
-    state.clear();
 
     // notify listeners that the state has changed
     state = {...state};

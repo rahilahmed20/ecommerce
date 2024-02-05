@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:macstore/views/screens/main_screen.dart';
 
 class OrderPlacedScreen extends StatelessWidget {
   @override
@@ -25,8 +26,10 @@ class OrderPlacedScreen extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Navigate back to the home screen or any other screen
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => MainScreen()),
+                );
               },
               child: Text('Continue Shopping'),
             ),

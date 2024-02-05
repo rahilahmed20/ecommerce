@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:macstore/controllers/favourite_controller.dart';
 import 'package:macstore/provider/favorite_provider.dart';
 import 'package:macstore/views/screens/inner_screen/product_detail.dart';
 
@@ -87,10 +88,14 @@ class _ProductModelState extends ConsumerState<ProductModel> {
                       onPressed: () {
                         if (_favoriteProvider.getFavoriteItem
                             .containsKey(widget.productData['productId'])) {
+                          FavouriteController().removeProductFromFavourites(
+                              widget.productData['productId']);
                           _favoriteProvider
                               .removeItem(widget.productData['productId']);
                         } else {
-                          _favoriteProvider.addProuctToFavorite(
+                          FavouriteController().addProductToFavourites(
+                              productId: widget.productData['productId']);
+                          _favoriteProvider.addProductToFavorite(
                               productName: widget.productData['productName'],
                               productId: widget.productData['productId'],
                               imageUrl: widget.productData['productImages'],

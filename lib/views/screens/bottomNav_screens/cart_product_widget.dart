@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:macstore/controllers/cart_controller.dart';
 import 'package:macstore/provider/product_provider.dart';
 import 'package:macstore/views/screens/inner_screen/checkout_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
@@ -17,10 +20,19 @@ class CartScreenProduct extends ConsumerStatefulWidget {
 
 class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    updateCartProvider();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final _cartProvider = ref.read(cartProvider.notifier);
     final cartData = ref.watch(cartProvider);
     final totalAmount = ref.read(cartProvider.notifier).calculateTotalAmount();
+    List<bool> checkoutList = List<bool>.filled(cartData.length, true);
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize:
@@ -126,6 +138,9 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                   itemCount: cartData.length,
                   itemBuilder: (context, index) {
                     final cartItem = cartData.values.toList()[index];
+                    if (cartItem.quantity > cartItem.totalQuantity) {
+                      checkoutList[index] = false;
+                    }
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 20),
@@ -206,9 +221,27 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                                 children: [
                                   Row(
                                     children: [
-                                      SizedBox(
-                                        width: 85,
-                                      ),
+                                      cartItem.totalQuantity < cartItem.quantity
+                                          ? Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.redAccent,
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
+                                              padding: EdgeInsets.all(5.0),
+                                              child: Text(
+                                                'Out of Stock',
+                                                style: GoogleFonts.getFont(
+                                                  'Lato',
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                  letterSpacing: 1,
+                                                ),
+                                              ),
+                                            )
+                                          : SizedBox(
+                                              width: 85,
+                                            ),
                                       // Remove Button
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
@@ -218,6 +251,8 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                                               if (cartItem.quantity > 1) {
                                                 _cartProvider.decrementItem(
                                                     cartItem.productId);
+                                                checkoutList[index] = true;
+                                                setState(() {});
                                               }
                                             },
                                             icon: Container(
@@ -248,8 +283,21 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                                           // Add Button
                                           IconButton(
                                             onPressed: () {
-                                              _cartProvider.incrementItem(
-                                                  cartItem.productId);
+                                              if (cartItem.totalQuantity >
+                                                  cartItem.quantity) {
+                                                _cartProvider.incrementItem(
+                                                    cartItem.productId);
+                                                CartController()
+                                                    .addProductToCart(
+                                                        productId:
+                                                            cartItem.productId,
+                                                        quantity:
+                                                            cartItem.quantity,
+                                                        size: cartItem
+                                                            .productSize);
+                                                checkoutList[index] = true;
+                                                setState(() {});
+                                              }
                                             },
                                             icon: Container(
                                               width: 26,
@@ -287,6 +335,8 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                                     onPressed: () {
                                       _cartProvider
                                           .removeItem(cartItem.productId);
+                                      CartController().removeItemFromCart(
+                                          cartItem.productId);
                                     },
                                     icon: Icon(
                                       CupertinoIcons.delete,
@@ -334,15 +384,16 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                     )
                   : ElevatedButton(
                       onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return CheckoutScreen();
-                        }));
+                        checkoutList.contains(false)
+                            ? null
+                            : Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                                return CheckoutScreen();
+                              }));
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          Color(0xFF3C55EF),
-                        ),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Color(0xFF3C55EF)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -376,5 +427,103 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
         ),
       ),
     );
+  }
+
+  Future<void> updateCartProvider() async {
+    try {
+      // Fetch cart data including product IDs, size, quantity, and additional details
+      List<Map<String, dynamic>> cartData = await getCartData();
+
+      // Iterate over each cart item
+      for (Map<String, dynamic> cartItem in cartData) {
+        String productId = cartItem['productId'];
+
+        // Add the product details to the CartNotifier
+        ref.read(cartProvider.notifier).addProductToCart(
+            productName: cartItem['productName'],
+            productPrice: cartItem['productPrice'],
+            categoryName: cartItem['categoryName'],
+            imageUrl: cartItem['imageUrl'],
+            quantity: cartItem['quantity'],
+            productId: productId,
+            productSize: cartItem['size'],
+            discount: cartItem['discount'],
+            description: cartItem['description'],
+            storeId: cartItem['storeId'],
+            totalQuantity: cartItem['totalQuantity']);
+      }
+    } catch (error) {
+      print('Error fetching and initializing product details: $error');
+    }
+  }
+
+  // fetch the cart data
+  Future<List<Map<String, dynamic>>> getCartData() async {
+    List<Map<String, dynamic>> cartData = [];
+
+    try {
+      // Get the currently logged-in user
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore
+            .instance
+            .collection('buyers')
+            .doc(user.uid)
+            .get();
+
+        List<dynamic>? cartItems = userDoc['cartItems'];
+
+        if (cartItems != null) {
+          // Iterate through the 'cartItems' array and extract product details
+          for (Map<String, dynamic> cartItem in cartItems) {
+            String productId = cartItem['productId'];
+            String size = cartItem['size'];
+            int quantity = cartItem['quantity'];
+
+            // Fetch additional details for the current product ID
+            Map<String, dynamic>? productDetails =
+                await getProductDetailsById(productId);
+
+            if (productDetails != null) {
+              // Add the combined details to the cartData list
+              cartData.add({
+                'productId': productId,
+                'size': size,
+                'quantity': quantity,
+                'productName': productDetails['productName'].toString(),
+                'productPrice': productDetails['price'] as num,
+                'categoryName': productDetails['category'],
+                'imageUrl': productDetails['productImages'],
+                'discount': productDetails['discountPrice'],
+                'description': productDetails['description'],
+                'storeId': productDetails['storeId'],
+                'totalQuantity': productDetails['quantity']
+              });
+            }
+          }
+        }
+      }
+    } catch (error) {
+      print('Error fetching cart data from the database: $error');
+    }
+
+    return cartData;
+  }
+
+  // fetch all the product details from product Id
+  Future<Map<String, dynamic>?> getProductDetailsById(String productId) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> productDoc =
+          await FirebaseFirestore.instance
+              .collection('products')
+              .doc(productId)
+              .get();
+
+      return productDoc.data();
+    } catch (error) {
+      print('Error fetching product details by ID: $error');
+      return null;
+    }
   }
 }

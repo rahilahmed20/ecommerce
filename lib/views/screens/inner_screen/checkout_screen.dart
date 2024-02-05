@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:macstore/controllers/cart_controller.dart';
 import 'package:macstore/views/screens/inner_screen/order_placed_screen.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:macstore/provider/product_provider.dart';
@@ -650,15 +651,20 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               if (selectedPaymentOption == 'CashOnDelivery') {
                 // Additional logic for Cash on Delivery
                 // Save order details with the common order ID
-                await saveOrderDetails();
-                // Send order notification with orderId
-                sendOrderNotification(
-                    "shaikhwasiullah500@gmail.com", orderId, false);
+                bool result = await saveOrderDetails();
+                if (result) {
+                  // Send order notification with orderId
+                  updateQuantity();
 
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => OrderPlacedScreen()),
-                );
+                  sendOrderNotification(
+                      "shaikhwasiullah500@gmail.com", orderId, false);
+
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => OrderPlacedScreen()),
+                  );
+                }
               } else {
                 // Additional logic for Online Payment
                 // Make the online payment
@@ -704,7 +710,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
-  Future<void> saveOrderDetails() async {
+  Future<bool> saveOrderDetails() async {
     DateTime now = DateTime.now();
     // String formattedTimestamp = DateFormat('dd-MM-yyyy hh:mm a').format(now);
     String formattedTimestamp =
@@ -720,19 +726,31 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     List<Map<String, dynamic>> orderItems = [];
 
     // Build the list of order items
-    if (_cartProvider.getCartItems != null) {
-      for (var entry in _cartProvider.getCartItems.entries) {
-        var item = entry.value;
+    for (var entry in _cartProvider.getCartItems.entries) {
+      var item = entry.value;
 
-        orderItems.add({
-          'productName': item.productName,
-          'productId': item.productId,
-          'size': item.productSize,
-          'quantity': item.quantity,
-          'productCategory': item.catgoryName,
-          'productImage': item.imageUrl[0],
-        });
+      DocumentSnapshot productSnapshot =
+          await _firestore.collection('products').doc(item.productId).get();
+
+      if (productSnapshot['quantity'] < item.quantity) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(item.productName + 'is out of stock'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return false;
       }
+
+      orderItems.add({
+        'productName': item.productName,
+        'productId': item.productId,
+        'size': item.productSize,
+        'quantity': item.quantity,
+        'productCategory': item.catgoryName,
+        'productImage': item.imageUrl[0],
+        'price': item.productPrice
+      });
     }
 
     try {
@@ -754,29 +772,101 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         "processing": true,
         "mode": selectedPaymentOption,
         'timestamp': formattedTimestamp,
-        // ... (other order details)
       });
+      CartController().clearCart();
+      _cartProvider.clearCart();
+      return true;
     } catch (error) {
       print('Error saving order details: $error');
-      // Handle the error as needed (e.g., show a user-friendly message)
+    }
+    return false;
+  }
+
+  Future<bool> checkAvailability() async {
+    final _cartProvider = ref.read(cartProvider.notifier);
+
+    // Build the list of order items
+    for (var entry in _cartProvider.getCartItems.entries) {
+      var item = entry.value;
+
+      DocumentSnapshot productSnapshot =
+          await _firestore.collection('products').doc(item.productId).get();
+
+      if (productSnapshot['quantity'] < item.quantity) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(item.productName + 'is out of stock'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<void> updateQuantity() async {
+    final _cartProvider = ref.read(cartProvider.notifier);
+
+    // Build the list of order items
+    for (var entry in _cartProvider.getCartItems.entries) {
+      var item = entry.value;
+
+      DocumentReference productDocRef =
+          _firestore.collection('products').doc(item.productId);
+
+      // Get the document snapshot
+      DocumentSnapshot productSnapshot = await productDocRef.get();
+
+      // Check if the document exists
+      if (productSnapshot.exists) {
+        // Get the current quantity
+        Map<String, dynamic>? productData =
+            productSnapshot.data() as Map<String, dynamic>?;
+
+        if (productData != null) {
+          int currentQuantity = productData['quantity'] ?? 0;
+
+          // Check if there's enough quantity to fulfill the order
+          if (currentQuantity >= item.quantity) {
+            // Update the quantity in Firestore
+            await productDocRef.update({
+              'quantity': currentQuantity - item.quantity,
+            });
+          } else {
+            // Handle insufficient quantity (optional)
+            print('Insufficient quantity for ${item.productName}');
+          }
+        } else {
+          // Handle case where product data is null
+          print('Product data is null for ${item.productName}');
+        }
+      } else {
+        // Handle case where the product document doesn't exist
+        print('Product document not found for ${item.productName}');
+      }
     }
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     try {
       // Save order details with the common order ID
-      await saveOrderDetails();
-      sendOrderNotification('shaikhwasiullah500@gmail.com', orderId, false);
-      Get.snackbar('Success', 'Payment Successfully Done',
-          colorText: Colors.green);
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => OrderPlacedScreen()),
-      );
-      // Additional logic for successful payment
-      sendOrderNotification('shaikhwasiullah500@gmail.com', orderId, false);
-      Get.snackbar('Success', 'Payment Successfully Done',
-          colorText: Colors.green);
+      bool result = await saveOrderDetails();
+
+      if (result) {
+        updateQuantity();
+        sendOrderNotification('shaikhwasiullah500@gmail.com', orderId, false);
+        Get.snackbar('Success', 'Payment Successfully Done',
+            colorText: Colors.green);
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => OrderPlacedScreen()),
+        );
+        // Additional logic for successful payment
+        sendOrderNotification('shaikhwasiullah500@gmail.com', orderId, false);
+        Get.snackbar('Success', 'Payment Successfully Done',
+            colorText: Colors.green);
+      }
     } catch (error) {
       print('Error saving orders after payment success: $error');
     }
@@ -798,7 +888,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     _razorpay.clear();
   }
 
-  makePayment(double totalAmount) {
+  makePayment(double totalAmount) async {
     var options = {
       'key': "rzp_test_fCBSWTYONMP298",
       'amount': (totalAmount * 100).toInt(),
@@ -812,7 +902,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         'wallets': ['paytm'] // optional, for adding support for wallets
       }
     };
-    _razorpay.open(options);
+    bool result = await checkAvailability();
+    if (result) {
+      _razorpay.open(options);
+    }
   }
 }
 

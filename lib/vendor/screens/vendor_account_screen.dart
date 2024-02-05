@@ -27,10 +27,10 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
       },
     );
 
-    if (confirmLogout != null && confirmLogout) {
+    if (confirmLogout) {
       await _auth.signOut().whenComplete(() async {
         var sharedPref = await SharedPreferences.getInstance();
-        sharedPref.setBool(SplashScreenState.KEYLOGIN, false);
+        sharedPref.setBool('login', false);
         sharedPref.setBool(VendorLoginScreenState.IsVendor, false);
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {

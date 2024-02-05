@@ -16,7 +16,6 @@ import 'package:macstore/vendor/authentication/vendor_login_Screen.dart';
 import 'package:macstore/views/screens/authentication_screens/login_screen.dart';
 import 'package:macstore/views/screens/inner_screen/order_screen.dart';
 import 'package:macstore/views/screens/inner_screen/shipping_address_screen.dart';
-import 'package:macstore/views/screens/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -295,10 +294,10 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
       },
     );
 
-    if (confirmLogout != null && confirmLogout) {
+    if (confirmLogout) {
       await _auth.signOut().whenComplete(() async {
         var sharedPref = await SharedPreferences.getInstance();
-        sharedPref.setBool(SplashScreenState.KEYLOGIN, false);
+        sharedPref.setBool('login', false);
         sharedPref.setBool(VendorLoginScreenState.IsVendor, false);
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {

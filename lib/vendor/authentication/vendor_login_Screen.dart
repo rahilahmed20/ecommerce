@@ -51,7 +51,7 @@ class VendorLoginScreenState extends State<VendorLoginScreen> {
 
         if (userRole == 'vendor') {
           var sharedPref = await SharedPreferences.getInstance();
-          sharedPref.setBool(SplashScreenState.KEYLOGIN, true);
+          sharedPref.setBool('login', true);
 
           sharedPref.setBool(IsVendor, true);
 

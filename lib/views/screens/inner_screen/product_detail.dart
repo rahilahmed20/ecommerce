@@ -3,6 +3,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:macstore/controllers/cart_controller.dart';
+import 'package:macstore/controllers/favourite_controller.dart';
 import 'package:macstore/provider/favorite_provider.dart';
 import 'package:macstore/provider/product_provider.dart';
 import 'package:macstore/provider/size_provider.dart';
@@ -46,6 +48,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
     final _cartProvider = ref.read(cartProvider.notifier);
     final cartItem = ref.watch(cartProvider);
     final isInCart = cartItem.containsKey(widget.productData['productId']);
+
     final selectedSize = ref.watch(selectedSizeProvider);
     return Scaffold(
       body: SingleChildScrollView(
@@ -143,10 +146,14 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                           onPressed: () {
                             if (_favoriteProvider.getFavoriteItem
                                 .containsKey(widget.productData['productId'])) {
+                              FavouriteController().removeProductFromFavourites(
+                                  widget.productData['productId']);
                               _favoriteProvider
                                   .removeItem(widget.productData['productId']);
                             } else {
-                              _favoriteProvider.addProuctToFavorite(
+                              FavouriteController().addProductToFavourites(
+                                  productId: widget.productData['productId']);
+                              _favoriteProvider.addProductToFavorite(
                                   productName:
                                       widget.productData['productName'],
                                   productId: widget.productData['productId'],
@@ -315,7 +322,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                           // color: const Color(0xFF3C55EF),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
+                          letterSpacing: 0.7,
                         ),
                       ),
 
@@ -330,7 +337,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                           style: GoogleFonts.getFont(
                             'Lato',
                             color: const Color(0xFF9A9998),
-                            fontSize: 17,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 1,
                           ),
@@ -419,11 +426,13 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                         // Add Button
                         IconButton(
                           onPressed: () {
-                            _cartProvider
-                                .incrementItem(widget.productData['productId']);
-                            setState(() {
-                              qty++;
-                            });
+                            if (qty < widget.productData['quantity']) {
+                              _cartProvider.incrementItem(
+                                  widget.productData['productId']);
+                              setState(() {
+                                qty++;
+                              });
+                            }
                           },
                           icon: Container(
                             width: 26,
@@ -441,6 +450,52 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                         ),
                       ],
                     ),
+                  ),
+
+                  SizedBox(
+                    height: 10,
+                  ),
+
+                  // Stock
+                  Row(
+                    children: [
+                      Text(
+                        'Status: ',
+                        style: GoogleFonts.getFont(
+                          'Lato',
+                          // color: const Color(0xFF9A9998),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: qty <= widget.productData['quantity'] &&
+                                    widget.productData['quantity'] > 0
+                                ? Colors.green
+                                : Colors.red.withOpacity(0.8)),
+                        child: Text(
+                          widget.productData['quantity'] > 0 &&
+                                  qty <= widget.productData['quantity']
+                              ? 'In Stock'
+                              : 'Out Of Stock',
+                          style: GoogleFonts.getFont(
+                            'Lato',
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      )
+                    ],
                   ),
 
                   // Attributes
@@ -636,58 +691,63 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
       bottomSheet: Padding(
         padding: const EdgeInsets.all(8.0),
         child: InkWell(
-          onTap: isInCart
-              ? () {
-                  _cartProvider.removeItem(widget.productData['productId']);
-                }
-              : () {
-                  _cartProvider.addProductToCart(
-                    productName: widget.productData['productName'],
-                    productPrice: widget.productData['price'],
-                    catgoryName: widget.productData['category'],
-                    imageUrl: widget.productData['productImages'],
-                    quantity: qty,
-                    productId: widget.productData['productId'],
-                    productSize: (widget.productData['productSize'].isEmpty)
-                        ? ''
-                        : selectedSize,
-                    discount: widget.productData['discountPrice'],
-                    description: widget.productData['description'],
-                    storeId: widget.productData['storeId'],
-                  );
-                },
+          onTap: !(widget.productData['quantity'] > 0 &&
+                  qty <= widget.productData['quantity'])
+              ? null // Disable the button when quantity is less than or equal to 0
+              : isInCart
+                  ? () {
+                      _cartProvider.removeItem(widget.productData['productId']);
+                      CartController()
+                          .removeItemFromCart(widget.productData['productId']);
+                    }
+                  : () {
+                      CartController().addProductToCart(
+                        productId: widget.productData['productId'],
+                        quantity: qty,
+                        size: (widget.productData['productSize'].isEmpty)
+                            ? ''
+                            : selectedSize,
+                      );
+
+                      _cartProvider.addProductToCart(
+                        productName: widget.productData['productName'],
+                        productPrice: widget.productData['price'],
+                        categoryName: widget.productData['category'],
+                        imageUrl: widget.productData['productImages'],
+                        quantity: qty,
+                        productId: widget.productData['productId'],
+                        productSize: (widget.productData['productSize'].isEmpty)
+                            ? ''
+                            : selectedSize,
+                        discount: widget.productData['discountPrice'],
+                        description: widget.productData['description'],
+                        storeId: widget.productData['storeId'],
+                        totalQuantity: widget.productData['quantity'],
+                      );
+                    },
           child: Container(
             width: MediaQuery.of(context).size.width,
             height: 48,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
-              color: isInCart ? Colors.grey : const Color(0xFF3B54EE),
+              color: !(widget.productData['quantity'] > 0 &&
+                      qty <= widget.productData['quantity'])
+                  ? Colors.grey
+                  : (isInCart ? Colors.grey : const Color(0xFF3B54EE)),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Align(
-              alignment: Alignment.center,
-              child: isInCart
-                  ? Text(
-                      'Remove From CART',
-                      style: GoogleFonts.getFont(
-                        'Lato',
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                      ),
-                    )
-                  : Text(
-                      'ADD TO CART',
-                      style: GoogleFonts.getFont(
-                        'Lato',
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                      ),
-                    ),
-            ),
+                alignment: Alignment.center,
+                child: Text(
+                  isInCart ? 'Remove From CART' : 'ADD TO CART',
+                  style: GoogleFonts.getFont(
+                    'Lato',
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                )),
           ),
         ),
       ),

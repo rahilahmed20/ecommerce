@@ -24,30 +24,32 @@ class FavouriteController extends GetxController {
       favouriteProductIds.add(productId);
 
       // Update the user's document in Firestore
-      updateUserFavourites();
+      updateUserFavourites(true, productId);
     }
   }
 
   void removeProductFromFavourites(String productId) {
-    // Remove the productId from favouriteProductIds
+    // Remove the productId from favouriteProductIds locally
     favouriteProductIds.remove(productId);
 
     // Update the user's document in Firestore
-    updateUserFavourites();
+    updateUserFavourites(false, productId);
   }
 
-  bool isProductInFavourites(String productId) {
-    return favouriteProductIds.contains(productId);
-  }
-
-  Future<void> updateUserFavourites() async {
+  Future<void> updateUserFavourites(bool add, String productId) async {
     try {
       User? user = _auth.currentUser;
 
       if (user != null) {
-        await _firestore.collection('buyers').doc(user.uid).update({
-          'favouriteProducts': favouriteProductIds,
-        });
+        if (add) {
+          await _firestore.collection('buyers').doc(user.uid).update({
+            'favouriteProducts': FieldValue.arrayUnion([productId]),
+          });
+        } else {
+          await _firestore.collection('buyers').doc(user.uid).update({
+            'favouriteProducts': FieldValue.arrayRemove([productId])
+          });
+        }
       }
     } catch (e) {
       print('Error updating user favourites: $e');

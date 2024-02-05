@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:macstore/controllers/favourite_controller.dart';
 import 'package:macstore/provider/favorite_provider.dart';
 import 'package:macstore/views/screens/main_screen.dart';
 
@@ -171,10 +172,16 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
                                   onPressed: () {
                                     if (_favoriteProvider.getFavoriteItem
                                         .containsKey(wishData.productId)) {
+                                      FavouriteController()
+                                          .removeProductFromFavourites(
+                                              wishData.productId);
                                       _favoriteProvider
                                           .removeItem(wishData.productId);
                                     } else {
-                                      _favoriteProvider.addProuctToFavorite(
+                                      FavouriteController()
+                                          .addProductToFavourites(
+                                              productId: wishData.productId);
+                                      _favoriteProvider.addProductToFavorite(
                                           productName: wishData.productName,
                                           productId: wishData.productId,
                                           imageUrl: wishData.imageUrl,

@@ -11,7 +11,7 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
   void addProductToCart({
     required String productName,
     required num productPrice,
-    required String catgoryName,
+    required String categoryName,
     required List imageUrl,
     required int quantity,
     required String productId,
@@ -19,6 +19,7 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
     required num discount,
     required String description,
     required String storeId,
+    required int totalQuantity,
   }) {
     if (state.containsKey(productId)) {
       state = {
@@ -34,6 +35,7 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
           discount: state[productId]!.discount,
           description: state[productId]!.description,
           storeId: state[storeId]!.storeId,
+          totalQuantity: state[productId]!.totalQuantity,
         )
       };
     } else {
@@ -42,7 +44,7 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
         productId: CartModel(
           productName: productName,
           productPrice: productPrice,
-          catgoryName: catgoryName,
+          catgoryName: categoryName,
           imageUrl: imageUrl,
           quantity: quantity,
           productId: productId,
@@ -50,9 +52,20 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
           discount: discount,
           description: description,
           storeId: storeId,
+          totalQuantity: totalQuantity
         )
       };
     }
+  }
+
+  Map<String, CartModel> get getCartItems => state;
+
+  List<CartModel> getAllCartItems() {
+    return state.values.toList();
+  }
+
+  void clearCart() {
+    state = {}; // Reset the state to an empty map
   }
 
   void decrementItem(String productId) {
@@ -87,6 +100,4 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
 
     return totalAmount;
   }
-
-  Map<String, CartModel> get getCartItems => state;
 }

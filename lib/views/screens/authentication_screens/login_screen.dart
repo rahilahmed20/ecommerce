@@ -6,7 +6,6 @@ import 'package:macstore/vendor/authentication/vendor_register_screen.dart';
 import 'package:macstore/views/screens/authentication_screens/forget_password_screen.dart';
 import 'package:macstore/views/screens/authentication_screens/register_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
-import 'package:macstore/views/screens/splash_screen.dart';
 import 'package:macstore/views/screens/widgets/button_widget.dart';
 import 'package:macstore/views/screens/widgets/custom_text_Field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (userRole == 'buyer') {
           var sharedPref = await SharedPreferences.getInstance();
-          sharedPref.setBool(SplashScreenState.KEYLOGIN, true);
+          sharedPref.setBool('login', true);
 
           Get.offAll(MainScreen());
 

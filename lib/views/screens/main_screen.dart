@@ -4,15 +4,18 @@ import 'package:macstore/views/screens/bottomNav_screens/favorite_screen.dart';
 import 'package:macstore/views/screens/bottomNav_screens/stores_screen.dart';
 import 'package:macstore/views/screens/home_Screen.dart';
 import 'package:macstore/views/screens/bottomNav_screens/cart_product_widget.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../provider/product_provider.dart';
+import 'inner_screen/drawer_screen.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen> {
   int pageIndex = 0;
 
   List<Widget> pages = [
@@ -25,7 +28,12 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cartData = ref.watch(cartProvider);
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Ghar Ka Bazar'),
+      ),
+      drawer: DrawerScreen(),
       bottomNavigationBar: BottomNavigationBar(
         onTap: (value) {
           setState(() {
@@ -46,6 +54,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             label: 'Home',
           ),
+
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/love.png',
@@ -61,14 +70,47 @@ class _MainScreenState extends State<MainScreen> {
           //   ),
           //   label: 'Stores',
           // ),
+
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/cart.png',
-              width: 25,
-              color: pageIndex == 2 ? Color(0xFF3C55EF) : Colors.grey,
+            icon:
+                // cartData.isEmpty
+                //     ? Image.asset(
+                //         'assets/icons/cart_empty',
+                //         width: 25,
+                //         color: pageIndex == 2 ? Color(0xFF3C55EF) : Colors.grey,
+                //       )
+                //     :
+                Stack(
+              children: [
+                Image.asset(
+                  'assets/icons/cart.png',
+                  width: 25,
+                  color: pageIndex == 2 ? Color(0xFF3C55EF) : Colors.grey,
+                ),
+                if (cartData.isNotEmpty)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.yellow.shade800,
+                      ),
+                      child: Text(
+                        cartData.length.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             label: 'Cart',
           ),
+
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/user.png',

@@ -14,13 +14,12 @@ void main() async {
   Platform.isAndroid
       ? await Firebase.initializeApp(
           options: FirebaseOptions(
-            apiKey: "AIzaSyCH6udt3Uej6avks-Qt5lIBj5tZSBmDa88",
-            appId: '1:680431886179:android:77d88f72b0b9315303bd56',
-            messagingSenderId: '680431886179',
-            projectId: 'store-ba3d8',
-            storageBucket: "gs://store-ba3d8.appspot.com",
-          ),
-        ).then((value) {
+          apiKey: "AIzaSyCH6udt3Uej6avks-Qt5lIBj5tZSBmDa88",
+          appId: '1:680431886179:android:77d88f72b0b9315303bd56',
+          messagingSenderId: '680431886179',
+          projectId: 'store-ba3d8',
+          storageBucket: "gs://store-ba3d8.appspot.com",
+        )).then((value) {
           Get.put(AuthController());
         })
       : await Firebase.initializeApp();
@@ -28,20 +27,10 @@ void main() async {
   runApp(ProviderScope(child: const MyApp()));
 }
 
-class MyApp extends ConsumerStatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends ConsumerState<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    // Initialize controllers here if needed
-  }
-
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(

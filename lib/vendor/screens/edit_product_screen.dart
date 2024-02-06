@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:macstore/views/screens/widgets/button_widget.dart';
 import 'package:uuid/uuid.dart';
@@ -38,11 +40,12 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
   bool _entered = false;
   String? fileName;
   bool _isSave = false;
-  int quantity = 0;
 
   final String apiKey = 'mLq1RQ3tbsna8my9oZG9vkNj';
   FilePickerResult? result;
 
+  // upload image
+  // upload image
   // upload image
   uploadImage() async {
     for (var selectedImage in images) {
@@ -79,7 +82,6 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
         'productSize': _sizeList,
         'productName': prouctName,
         'price': price.toDouble(),
-        'quantity': quantity,
         'discountPrice': discountPrice.toDouble(),
         'description': description,
         'productImages': imagesUrl,
@@ -324,24 +326,6 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                       return null;
                     }
                   }, maxLines: 3),
-
-                  SizedBox(height: 16),
-
-                  buildInputField(
-                    'Quantity',
-                    TextInputType.number,
-                    (value) {
-                      quantity = int.tryParse(value) ?? 0;
-                    },
-                    (value) {
-                      if (value!.isEmpty) {
-                        return "Please enter a quantity";
-                      } else {
-                        return null;
-                      }
-                    },
-                  ),
-
                   SizedBox(height: 16),
                   // Product Sizes
 

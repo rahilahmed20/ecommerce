@@ -5,8 +5,8 @@ import 'package:macstore/views/screens/bottomNav_screens/stores_screen.dart';
 import 'package:macstore/views/screens/home_Screen.dart';
 import 'package:macstore/views/screens/bottomNav_screens/cart_product_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../screens/widgets/drawer_screen.dart';
 import '../../provider/product_provider.dart';
-import 'inner_screen/drawer_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -28,6 +28,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final _cartProvider = ref.read(cartProvider.notifier);
     final cartData = ref.watch(cartProvider);
     return Scaffold(
       appBar: AppBar(

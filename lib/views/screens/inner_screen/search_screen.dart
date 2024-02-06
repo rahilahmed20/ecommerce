@@ -100,13 +100,13 @@ class _SearchScreenState extends State<SearchScreen> {
             if (searchedValue.isEmpty) {
               return Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 40),
+                  padding: const EdgeInsets.only(top: 20),
                   child: Text(
                     'You can search for products',
                     style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black.withOpacity(0.4)),
+                        color: Colors.black.withOpacity(0.6)),
                     textAlign: TextAlign.center,
                   ),
                 ),

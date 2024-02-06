@@ -10,12 +10,12 @@ class AllProductScreen extends StatelessWidget {
   final bool isPopularProducts;
   final bool isSearch;
 
-  AllProductScreen({
-    Key? key,
-    required this.products,
-    required this.isPopularProducts,
-    required this.isSearch
-  }) : super(key: key);
+  AllProductScreen(
+      {Key? key,
+      required this.products,
+      required this.isPopularProducts,
+      required this.isSearch})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,55 +23,57 @@ class AllProductScreen extends StatelessWidget {
         isPopularProducts ? 'Popular Products' : 'Recommended Products';
 
     return Scaffold(
-      appBar: isSearch ? null : PreferredSize(
-        preferredSize:
-            Size.fromHeight(MediaQuery.of(context).size.height * 0.20),
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: 118,
-          clipBehavior: Clip.hardEdge,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(
-                'assets/icons/cartb.png',
+      appBar: isSearch
+          ? null
+          : PreferredSize(
+              preferredSize:
+                  Size.fromHeight(MediaQuery.of(context).size.height * 0.20),
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 118,
+                clipBehavior: Clip.hardEdge,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/icons/cartb.png',
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned(
+                      left: 61,
+                      top: 51,
+                      child: Text(
+                        title,
+                        style: GoogleFonts.getFont(
+                          'Lato',
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 23,
+                      top: 54,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back_ios,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
-              fit: BoxFit.cover,
             ),
-          ),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Positioned(
-                left: 61,
-                top: 51,
-                child: Text(
-                  title,
-                  style: GoogleFonts.getFont(
-                    'Lato',
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 23,
-                top: 54,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(

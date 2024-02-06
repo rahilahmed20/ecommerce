@@ -77,11 +77,12 @@ class OrderScreen extends StatelessWidget {
           }
 
           final orders = snapshot.data!.docs;
-
+          final reversedOrders = orders.reversed.toList();
           return ListView.builder(
-            itemCount: orders.length,
+            itemCount: reversedOrders.length,
             itemBuilder: (context, index) {
-              final orderData = orders[index].data() as Map<String, dynamic>;
+              final orderData =
+                  reversedOrders[index].data() as Map<String, dynamic>;
               final items = orderData['items'] as List<dynamic>;
 
               return Padding(
@@ -232,6 +233,20 @@ class OrderScreen extends StatelessWidget {
                                             child: Text(
                                               '\u{20B9}' +
                                                   item['price'].toString(),
+                                              style: GoogleFonts.getFont(
+                                                'Lato',
+                                                color: const Color(0xFF0B0C1E),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                height: 1.3,
+                                              ),
+                                            ),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              'qty:' +
+                                                  item['quantity'].toString(),
                                               style: GoogleFonts.getFont(
                                                 'Lato',
                                                 color: const Color(0xFF0B0C1E),

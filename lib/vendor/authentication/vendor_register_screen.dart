@@ -194,7 +194,7 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
                           height: 20,
                         ),
                       ),
-                      text: 'enter your address',
+                      text: 'enter your addres',
                       validator: (value) {
                         if (value!.isEmpty) {
                           return 'enter company address';

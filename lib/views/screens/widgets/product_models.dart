@@ -80,6 +80,24 @@ class _ProductModelState extends ConsumerState<ProductModel> {
                       ),
                     ),
 
+                  // Out of Stock
+                  if (widget.productData['quantity'] <= 0)
+                    Positioned(
+                        top: 80,
+                        child: Container(
+                            color: Colors.white.withOpacity(0.4),
+                            width: 180,
+                            height: 40,
+                            child: Center(
+                              child: Text(
+                                'Out Of Stock',
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16),
+                              ),
+                            ))),
+
                   // Favourite Icon Button
                   Positioned(
                     top: 0,
@@ -131,28 +149,34 @@ class _ProductModelState extends ConsumerState<ProductModel> {
                 child: Column(
                   children: [
                     // Title
-                    Text(
-                      widget.productData['productName'].toString(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Color(0xFF1E3354),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Lato',
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        widget.productData['productName'].toString(),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Color(0xFF1E3354),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Lato',
+                        ),
                       ),
                     ),
 
                     // Description
-                    Text(
-                      widget.productData['description'].toString(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.black.withOpacity(0.5),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Lato',
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        widget.productData['description'].toString(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.black.withOpacity(0.5),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Lato',
+                        ),
                       ),
                     ),
 
@@ -160,53 +184,56 @@ class _ProductModelState extends ConsumerState<ProductModel> {
                       height: 5,
                     ),
 
-                    Row(
-                      children: [
-                        // Original Price (if not equal to discounted price)
-                        if (widget.productData['price'] !=
-                            widget.productData['discountPrice'])
-                          Row(
-                            children: [
-                              Text(
-                                '\u{20B9}' +
-                                    (widget.productData['price'] % 1 == 0
-                                        ? widget.productData['price']
-                                            .toInt()
-                                            .toString()
-                                        : widget.productData['price']
-                                            .toString()),
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                  letterSpacing: 0.3,
-                                  decoration: TextDecoration.lineThrough,
-                                  fontFamily: 'Lato',
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Row(
+                        children: [
+                          // Original Price (if not equal to discounted price)
+                          if (widget.productData['price'] !=
+                              widget.productData['discountPrice'])
+                            Row(
+                              children: [
+                                Text(
+                                  '\u{20B9}' +
+                                      (widget.productData['price'] % 1 == 0
+                                          ? widget.productData['price']
+                                              .toInt()
+                                              .toString()
+                                          : widget.productData['price']
+                                              .toString()),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                    letterSpacing: 0.3,
+                                    decoration: TextDecoration.lineThrough,
+                                    fontFamily: 'Lato',
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                            ],
-                          ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                              ],
+                            ),
 
-                        // Discounted Price
-                        Text(
-                          '\u{20B9}' +
-                              (widget.productData['discountPrice'] % 1 == 0
-                                  ? widget.productData['discountPrice']
-                                      .toInt()
-                                      .toString()
-                                  : widget.productData['discountPrice']
-                                      .toString()),
-                          style: TextStyle(
-                            color: Color(0xFF1E3354),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.4,
-                            fontFamily: 'Lato',
+                          // Discounted Price
+                          Text(
+                            '\u{20B9}' +
+                                (widget.productData['discountPrice'] % 1 == 0
+                                    ? widget.productData['discountPrice']
+                                        .toInt()
+                                        .toString()
+                                    : widget.productData['discountPrice']
+                                        .toString()),
+                            style: TextStyle(
+                              color: Color(0xFF1E3354),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.4,
+                              fontFamily: 'Lato',
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     )
                   ],
                 ),

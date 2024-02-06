@@ -12,6 +12,7 @@ class AuthController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // Function to create a new user
   Future<String> createNewUser(
     String email,
     String fullName,
@@ -21,24 +22,24 @@ class AuthController extends GetxController {
     String res = 'some error occurred';
 
     try {
+      // Create user with email and password
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
+      // Add user details to Firestore
       await _firestore.collection('buyers').doc(userCredential.user!.uid).set({
         'fullName': fullName,
         'profileImage': '',
         'email': email,
-        'phoneNumber': phoneNumber, // Added phoneNumber field
+        'phoneNumber': phoneNumber,
         'uid': userCredential.user!.uid,
         'pinCode ': "",
         'locality': "",
         'city': '',
         'state': '',
-        'cartItems': [],
-        'favouriteProducts': [],
       });
 
       res = 'success';
@@ -49,21 +50,25 @@ class AuthController extends GetxController {
     return res;
   }
 
+  // Function to log in a user
   Future<Map<String, dynamic>> loginUser(String email, String password) async {
     Map<String, dynamic> res = {'status': 'error', 'role': ''};
 
     try {
+      // Sign in user with email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
+      // Retrieve user details from Firestore
       DocumentSnapshot userDoc = await _firestore
           .collection('buyers')
           .doc(userCredential.user!.uid)
           .get();
 
       if (userDoc.exists) {
+        // If user exists in Firestore, set status to success
         res = {
           'status': 'success',
           'role': 'buyer',
@@ -78,25 +83,31 @@ class AuthController extends GetxController {
     return res;
   }
 
+  // Function to change user password
   Future<bool> changePassword(BuildContext context, String password) async {
     try {
+      // Get the current authenticated user
       User? currentUser = _auth.currentUser;
+
       if (currentUser != null) {
+        // Update user password
         await currentUser.updatePassword(password);
 
+        // Navigate to MainScreen and show a success message
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => MainScreen()));
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Password Changed'),
           backgroundColor: Colors.blue,
         ));
-        print('password Changed');
+        print('Password Changed');
         return true;
       } else {
         print('User is not authenticated');
         return false;
       }
     } on FirebaseAuthException catch (error) {
+      // Handle FirebaseAuthException and show error message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(error.code.toString()),
         backgroundColor: Colors.blue,

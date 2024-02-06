@@ -17,14 +17,13 @@ class vendorMainScreen extends StatefulWidget {
 class _vendorMainScreenState extends State<vendorMainScreen> {
   List<Widget> _pages = [
     HomeScreen(),
-    // StoresScreen(),
+    StoresScreen(),
     CartScreenProduct(),
     ProductUploadPage(),
     VendorOrderScreen(),
     VendorAccountScreen(),
   ];
   int pageIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +35,7 @@ class _vendorMainScreenState extends State<vendorMainScreen> {
         },
         currentIndex: pageIndex,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF3C55EF),
+        selectedItemColor: Colors.purple,
         unselectedItemColor: Colors.grey,
         items: [
           BottomNavigationBarItem(
@@ -44,40 +43,37 @@ class _vendorMainScreenState extends State<vendorMainScreen> {
             icon: Image.asset(
               'assets/icons/home.png',
               width: 25,
-              color: pageIndex == 0 ? Color(0xFF3C55EF) : Colors.grey,
             ),
             label: 'Home',
           ),
-          // BottomNavigationBarItem(
-          //   backgroundColor: Colors.white.withOpacity(0.95),
-          //   icon: Image.asset(
-          //     'assets/icons/mart.png',
-          //     width: 25,
-          //     color: pageIndex == 1 ? Color(0xFF3C55EF) : Colors.grey,
-          //   ),
-          //   label: 'Stores',
-          // ),
+          BottomNavigationBarItem(
+            backgroundColor: Colors.white.withOpacity(0.95),
+            icon: Image.asset(
+              'assets/icons/mart.png',
+              width: 25,
+            ),
+            label: 'Stores',
+          ),
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/cart.png',
               width: 25,
-              color: pageIndex == 1 ? Color(0xFF3C55EF) : Colors.grey,
             ),
             label: 'Cart',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.edit,
-                color: pageIndex == 2 ? Color(0xFF3C55EF) : Colors.grey),
+            icon: Icon(Icons.edit),
             label: 'Upload',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long_outlined,
-                color: pageIndex == 3 ? Color(0xFF3C55EF) : Colors.grey),
+            icon: Image.asset(
+              'assets/icons/orders.png',
+              width: 40,
+            ),
             label: 'Orders',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.money_dollar,
-                color: pageIndex == 4 ? Color(0xFF3C55EF) : Colors.grey),
+            icon: Icon(CupertinoIcons.money_dollar),
             label: 'Account',
           ),
         ],

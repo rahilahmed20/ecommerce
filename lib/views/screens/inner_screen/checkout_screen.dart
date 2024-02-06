@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:macstore/controllers/cart_controller.dart';
 import 'package:macstore/views/screens/inner_screen/order_placed_screen.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:macstore/provider/product_provider.dart';
@@ -104,178 +103,129 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     return ShippingAddressScreen();
                   }));
                 },
-                child: SizedBox(
-                  width: 335,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.95,
                   height: 74,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 336,
-                          height: 75,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              color: const Color(0xFFEFF0F2),
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 70,
-                        top: 17,
-                        child: SizedBox(
-                          width: 215,
-                          height: 41,
-                          child: Stack(
-                            clipBehavior: Clip.none,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: const Color(0xFFEFF0F2),
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.65,
+                          child: Row(
                             children: [
-                              Positioned(
-                                left: -1,
-                                top: -1,
-                                child: SizedBox(
-                                  width: 219,
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      InkWell(
-                                        onTap: () async {
-                                          final result = await Navigator.push(
-                                              context, MaterialPageRoute(
-                                                  builder: (context) {
-                                            return ShippingAddressScreen();
-                                          }));
-                                          if (result != null &&
-                                              result['addressFilled']) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                    'Proceed for payment.'),
-                                                duration: Duration(seconds: 2),
-                                              ),
-                                            );
-                                          } else {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                    'Please fill in all address details to proceed.'),
-                                                duration: Duration(seconds: 2),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: SizedBox(
-                                            width: 114,
-                                            child: Text(
-                                              state == ""
-                                                  ? "Add address"
-                                                  : state,
-                                              style: GoogleFonts.getFont(
-                                                'Lato',
-                                                color: const Color(0xFF0B0C1E),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                                height: 1.3,
-                                              ),
-                                            ),
+                              // Location Logo
+                              Container(
+                                width: 23,
+                                height: 23,
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFBF7F5),
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: Image.network(
+                                  'https://storage.googleapis.com/codeless-dev.appspot.com/uploads%2Fimages%2Fnn2Ldqjoc2Xp89Y7Wfzf%2F2ee3a5ce3b02828d0e2806584a6baa88.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+
+                              SizedBox(
+                                width: 20,
+                              ),
+
+                              // Address
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  InkWell(
+                                    onTap: () async {
+                                      final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) {
+                                        return ShippingAddressScreen();
+                                      }));
+                                      if (result != null &&
+                                          result['addressFilled']) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content:
+                                                Text('Proceed for payment.'),
+                                            duration: Duration(seconds: 2),
+                                          ),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Please fill in all address details to proceed.'),
+                                            duration: Duration(seconds: 2),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: SizedBox(
+                                        width: 114,
+                                        child: Text(
+                                          state == "" ? "Add address" : state,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: GoogleFonts.getFont(
+                                            'Lato',
+                                            color: const Color(0xFF0B0C1E),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            height: 1.3,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          city == ""
-                                              ? "Enter City"
-                                              : locality + " " + city,
-                                          style: GoogleFonts.getFont(
-                                            'Lato',
-                                            color: const Color(0xFF7F808C),
-                                            fontSize: 12,
-                                            height: 1.6,
-                                          ),
-                                        ),
-                                      )
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 16,
-                        top: 16,
-                        child: SizedBox.square(
-                          dimension: 42,
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Positioned(
-                                left: 0,
-                                top: 0,
-                                child: Container(
-                                  width: 43,
-                                  height: 43,
-                                  clipBehavior: Clip.hardEdge,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFBF7F5),
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      Positioned(
-                                        left: 11,
-                                        top: 11,
-                                        child: Image.network(
-                                          'https://storage.googleapis.com/codeless-dev.appspot.com/uploads%2Fimages%2Fnn2Ldqjoc2Xp89Y7Wfzf%2F2ee3a5ce3b02828d0e2806584a6baa88.png',
-                                          width: 20,
-                                          height: 20,
-                                          fit: BoxFit.contain,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
+                                  const SizedBox(height: 4),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      city == ""
+                                          ? "Enter City"
+                                          : locality + " " + city,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: GoogleFonts.getFont(
+                                        'Lato',
+                                        color: const Color(0xFF7F808C),
+                                        fontSize: 12,
+                                        height: 1.6,
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
-                              Positioned(
-                                left: 11,
-                                top: 11,
-                                child: Container(
-                                  width: 20,
-                                  height: 20,
-                                  clipBehavior: Clip.hardEdge,
-                                  decoration: const BoxDecoration(),
-                                ),
-                              )
                             ],
                           ),
                         ),
-                      ),
-                      Positioned(
-                        left: 305,
-                        top: 25,
-                        child: Image.network(
+                        Image.network(
                           'https://firebasestorage.googleapis.com/v0/b/codeless-app.appspot.com/o/projects%2Fnn2Ldqjoc2Xp89Y7Wfzf%2F6ce18a0efc6e889de2f2878027c689c9caa53feeedit%201.png?alt=media&token=a3a8a999-80d5-4a2e-a9b7-a43a7fa8789a',
                           width: 20,
                           height: 20,
                           fit: BoxFit.cover,
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -371,7 +321,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                               Align(
                                                 alignment: Alignment.centerLeft,
                                                 child: Text(
-                                                  cartItem.catgoryName,
+                                                  cartItem.categoryName,
                                                   style: GoogleFonts.getFont(
                                                     'Lato',
                                                     color:
@@ -747,7 +697,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         'productId': item.productId,
         'size': item.productSize,
         'quantity': item.quantity,
-        'productCategory': item.catgoryName,
+        'productCategory': item.categoryName,
         'productImage': item.imageUrl[0],
         'price': item.productPrice
       });
@@ -773,8 +723,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         "mode": selectedPaymentOption,
         'timestamp': formattedTimestamp,
       });
-      CartController().clearCart();
-      _cartProvider.clearCart();
       return true;
     } catch (error) {
       print('Error saving order details: $error');

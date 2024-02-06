@@ -337,6 +337,7 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                                           .removeItem(cartItem.productId);
                                       CartController().removeItemFromCart(
                                           cartItem.productId);
+                                      checkoutList.removeAt(index);
                                     },
                                     icon: Icon(
                                       CupertinoIcons.delete,
@@ -449,7 +450,6 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
             productSize: cartItem['size'],
             discount: cartItem['discount'],
             description: cartItem['description'],
-            storeId: cartItem['storeId'],
             totalQuantity: cartItem['totalQuantity']);
       }
     } catch (error) {

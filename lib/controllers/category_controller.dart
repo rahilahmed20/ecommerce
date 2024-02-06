@@ -14,6 +14,10 @@ class CategoryController extends GetxController {
 
   void _fetchCategories() {
     _firestore.collection('categories').snapshots().listen((querySnapshot) {
+      // Clear existing categories before updating the list
+      categories.clear();
+
+      // Update categories based on the new data from Firestore
       categories.assignAll(
         querySnapshot.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>;
@@ -29,7 +33,9 @@ class CategoryController extends GetxController {
 
       // Now, you have shuffled categories in the 'categories' list.
     }, onError: (error) {
+      // Handle errors during stream subscription
       print("Error fetching categories: $error");
+      // You can add additional error handling logic or show a message to the user
     });
   }
 }

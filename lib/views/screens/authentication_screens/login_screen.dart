@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/controllers/auth_controller.dart';
 import 'package:macstore/vendor/authentication/vendor_register_screen.dart';
 import 'package:macstore/views/screens/authentication_screens/forget_password_screen.dart';
+import 'package:macstore/views/screens/authentication_screens/login_with_otp.dart';
 import 'package:macstore/views/screens/authentication_screens/register_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
 import 'package:macstore/views/screens/widgets/button_widget.dart';
@@ -260,7 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Login vendor account?',
+                          'Login with Email and OTP?',
                           style: GoogleFonts.roboto(
                             fontSize: 14,
                             letterSpacing: 0.1,
@@ -271,7 +272,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
-                              return VendorLoginScreen();
+                              return LoginScreenOTP();
                             }));
                           },
                           child: Text(

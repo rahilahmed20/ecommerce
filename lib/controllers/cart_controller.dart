@@ -40,29 +40,6 @@ class CartController extends GetxController {
     updateUserCart(productId, quantity, size);
   }
 
-  Future<void> clearCart() async {
-    try {
-      User? user = _auth.currentUser;
-
-      if (user != null) {
-        // Get the user's document in Firestore
-        DocumentReference userDocRef =
-        _firestore.collection('buyers').doc(user.uid);
-
-        // Clear the cartItems array in Firestore
-        await userDocRef.update({
-          'cartItems': FieldValue.delete(),
-        });
-
-        // Clear the cartItems locally
-        cartItems.clear();
-      }
-    } catch (e) {
-      print('Error clearing cart: $e');
-    }
-  }
-
-
   Future<void> updateUserCart(
       String productId, int quantity, String size) async {
     try {

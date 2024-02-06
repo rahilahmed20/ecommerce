@@ -6,7 +6,7 @@ import '../widgets/button_widget.dart';
 import '../widgets/custom_text_Field.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
-  const ForgetPasswordScreen({super.key});
+  const ForgetPasswordScreen({Key? key});
 
   @override
   State<ForgetPasswordScreen> createState() => _ForgetPasswordScreenState();
@@ -22,19 +22,25 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
         _isLoading = true;
       });
 
+      // Send password reset email
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email.trim());
 
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Password reset link sent! Check your email'),
         backgroundColor: Colors.blue,
       ));
-
     } on FirebaseAuthException catch (e) {
+      // Handle Firebase authentication exception (error)
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(e.message.toString()),
+        content: Text(e.message ?? 'An error occurred'),
         backgroundColor: Colors.red,
       ));
+    } catch (e) {
+      // Handle other errors
+      print('Error: $e');
     } finally {
+      // Reset loading state
       setState(() {
         _isLoading = false;
       });
@@ -98,7 +104,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
               height: 30,
             ),
             ButtonWidgets(
-              isLoading: _isLoading ? true : false,
+              isLoading: _isLoading,
               buttonChange: passwordReset,
               buttonTitle: 'Reset Password',
             ),

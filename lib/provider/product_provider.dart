@@ -18,7 +18,6 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
     required String productSize,
     required num discount,
     required String description,
-    required String storeId,
     required int totalQuantity,
   }) {
     if (state.containsKey(productId)) {
@@ -28,13 +27,12 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
           productId: state[productId]!.productId,
           productName: state[productId]!.productName,
           productPrice: state[productId]!.productPrice,
-          catgoryName: state[productId]!.catgoryName,
+          categoryName: state[productId]!.categoryName,
           quantity: state[productId]!.quantity + 1,
           imageUrl: state[productId]!.imageUrl,
           productSize: state[productId]!.productSize,
           discount: state[productId]!.discount,
           description: state[productId]!.description,
-          storeId: state[storeId]!.storeId,
           totalQuantity: state[productId]!.totalQuantity,
         )
       };
@@ -42,18 +40,16 @@ class CartNotifier extends StateNotifier<Map<String, CartModel>> {
       state = {
         ...state,
         productId: CartModel(
-          productName: productName,
-          productPrice: productPrice,
-          catgoryName: categoryName,
-          imageUrl: imageUrl,
-          quantity: quantity,
-          productId: productId,
-          productSize: productSize,
-          discount: discount,
-          description: description,
-          storeId: storeId,
-          totalQuantity: totalQuantity
-        )
+            productName: productName,
+            productPrice: productPrice,
+            categoryName: categoryName,
+            imageUrl: imageUrl,
+            quantity: quantity,
+            productId: productId,
+            productSize: productSize,
+            discount: discount,
+            description: description,
+            totalQuantity: totalQuantity)
       };
     }
   }

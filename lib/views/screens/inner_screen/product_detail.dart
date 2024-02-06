@@ -190,56 +190,42 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
               padding: EdgeInsets.only(right: 24, left: 24, bottom: 24),
               child: Column(
                 children: [
-                  // Rating and Share
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Rating
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                            size: 24,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-
-                          // Dummy Rating
-                          Text('5.0'),
-                          SizedBox(
-                            width: 8,
-                          ),
-
-                          // Dummy Rating Number
-                          Text('(299)'),
-
-                          // Original Rating Code
-                          // if (widget.productData != null &&
-                          //     widget.productData.data().containsKey('rating'))
-                          //   widget.productData['rating'] == 0
-                          //       ? Text("")
-                          //       : Text(
-                          //           widget.productData['rating'].toString(),
-                          //           style: TextStyle(
-                          //             color: Color(0xFF7F8E9D),
-                          //             fontSize: 12,
-                          //             fontFamily: 'Lato',
-                          //           ),
-                          //         ),
-                        ],
-                      ),
-
-                      // Share Button
-                      IconButton(onPressed: () {}, icon: Icon(Icons.share))
-                    ],
-                  ),
-
                   // Price, Title, Stock and Brand
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // title
+                      Text(
+                        widget.productData['productName'],
+                        style: GoogleFonts.getFont(
+                          'Lato',
+                          // color: const Color(0xFF3C55EF),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.7,
+                        ),
+                      ),
+
+                      SizedBox(
+                        height: 5,
+                      ),
+
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          widget.productData['category'],
+                          style: GoogleFonts.getFont(
+                            'Lato',
+                            color: const Color(0xFF9A9998),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 5),
+
                       // price and sale tag
                       Row(
                         children: [
@@ -311,70 +297,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                           ),
                         ],
                       ),
-
-                      SizedBox(height: 5),
-
-                      // title
-                      Text(
-                        widget.productData['productName'],
-                        style: GoogleFonts.getFont(
-                          'Lato',
-                          // color: const Color(0xFF3C55EF),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.7,
-                        ),
-                      ),
-
-                      SizedBox(
-                        height: 5,
-                      ),
-
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          widget.productData['category'],
-                          style: GoogleFonts.getFont(
-                            'Lato',
-                            color: const Color(0xFF9A9998),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
                     ],
-                  ),
-
-                  // Give Rating
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (widget.productData
-                                    .data()
-                                    .containsKey('rating'))
-                                  rate.RatingBar.readOnly(
-                                    filledIcon: Icons.star,
-                                    emptyIcon: Icons.star_border,
-                                    initialRating: widget.productData['rating'],
-                                    maxRating: 5,
-                                    size: 18,
-                                  )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
 
                   // Quantity
@@ -721,7 +644,6 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                             : selectedSize,
                         discount: widget.productData['discountPrice'],
                         description: widget.productData['description'],
-                        storeId: widget.productData['storeId'],
                         totalQuantity: widget.productData['quantity'],
                       );
                     },

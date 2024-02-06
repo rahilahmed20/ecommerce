@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ButtonWidgets extends StatelessWidget {
- 
   final bool isLoading;
   final String buttonTitle;
   final void Function() buttonChange;
 
   const ButtonWidgets({
     super.key,
-  
     required this.buttonChange,
     required this.isLoading,
     required this.buttonTitle,

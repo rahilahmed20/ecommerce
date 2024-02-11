@@ -40,6 +40,7 @@ class AuthController extends GetxController {
         'locality': "",
         'city': '',
         'state': '',
+        'ban': false,
       });
 
       res = 'success';
@@ -68,11 +69,20 @@ class AuthController extends GetxController {
           .get();
 
       if (userDoc.exists) {
-        // If user exists in Firestore, set status to success
-        res = {
-          'status': 'success',
-          'role': 'buyer',
-        };
+        bool isBanned = userDoc['ban'] ?? false;
+        if (isBanned) {
+          // If user is banned, set status to error and provide a message
+          res = {
+            'status': 'error',
+            'message': 'You are banned from logging in.',
+          };
+        } else {
+          // If user exists in Firestore and is not banned, set status to success
+          res = {
+            'status': 'success',
+            'role': 'buyer',
+          };
+        }
       } else {
         res['status'] = 'Invalid user role or user not found.';
       }

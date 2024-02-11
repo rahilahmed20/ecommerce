@@ -3,15 +3,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:macstore/controllers/banners_controller.dart';
+import 'package:macstore/views/screens/inner_screen/banner_screen.dart';
 
 class BannerArea extends StatelessWidget {
   const BannerArea({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final BannerController bannerController = Get.find<BannerController>();
-
     double spacing = MediaQuery.of(context).size.width < 600 ? 16.0 : 32.0;
+
+    final BannerController bannerController = Get.find<BannerController>();
 
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -28,8 +29,8 @@ class BannerArea extends StatelessWidget {
           ),
         ],
       ),
-      child: StreamBuilder<List<String>>(
-        stream: bannerController.getBannerUrls(),
+      child: StreamBuilder<List<Map<String, dynamic>>>(
+        stream: bannerController.getBannerData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -58,8 +59,22 @@ class BannerArea extends StatelessWidget {
                   itemCount:
                       snapshot.data!.length > 5 ? 5 : snapshot.data!.length,
                   itemBuilder: (context, index, realIndex) {
-                    return BannerWidget(
-                      imageUrl: snapshot.data![index],
+                    return InkWell(
+                      onTap: () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return BannerScreen(
+                                CategoryName: snapshot.data![index]['category'],
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: BannerWidget(
+                        imageUrl: snapshot.data![index]['image'],
+                      ),
                     );
                   },
                   options: CarouselOptions(
@@ -120,7 +135,7 @@ class BannerWidget extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
-        width: 350,
+        width: MediaQuery.of(context).size.width * 0.85,
         errorWidget: (context, url, error) => Icon(
           Icons.error,
         ),

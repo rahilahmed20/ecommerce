@@ -15,18 +15,23 @@ class BannerController extends GetxController {
     carousalCurrentIndex.value = index;
   }
 
-  // Stream to get banner URLs from Firestore
-  Stream<List<String>> getBannerUrls() {
+// Stream to get banner data including URLs from Firestore
+  Stream<List<Map<String, dynamic>>> getBannerData() {
     return _firestore
         .collection('banners')
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => doc['image'] as String).toList();
+      return snapshot.docs.map((doc) {
+        Map<String, dynamic> bannerData = {
+          'image': doc['image'] as String,
+          'category': doc['category'] as String,
+          'timestamp': doc['timestamp'] as Timestamp,
+        };
+        return bannerData;
+      }).toList();
     }).handleError((error) {
-      // Handle errors during stream subscription
-      print('Error fetching banner URLs: $error');
-      // You can add additional error handling logic or show a message to the user
+      print('Error fetching banner data: $error');
     });
   }
 }

@@ -19,11 +19,46 @@ class CartScreenProduct extends ConsumerStatefulWidget {
 }
 
 class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
+  late bool isUserBanned = false;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     updateCartProvider();
+    checkUserBanStatus();
+  }
+
+  Future<void> checkUserBanStatus() async {
+    try {
+      // Get the currently logged-in user
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore
+            .instance
+            .collection('buyers')
+            .doc(user.uid)
+            .get();
+
+        // Fetch ban status from the user document
+        bool banned = userDoc['ban'] ?? false;
+
+        // Set the value of isUserBanned based on the ban status
+        setState(() {
+          isUserBanned = banned;
+        });
+      }
+    } catch (error) {
+      print('Error fetching user ban status: $error');
+    }
+  }
+
+  void showSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('You are banned and cannot proceed with checkout.'),
+      backgroundColor: Colors.red.shade400,
+    ));
   }
 
   @override
@@ -385,12 +420,18 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                     )
                   : ElevatedButton(
                       onPressed: () {
-                        checkoutList.contains(false)
-                            ? null
-                            : Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                                return CheckoutScreen();
-                              }));
+                        // Check if any item is out of stock or if the user is banned
+                        if (checkoutList.contains(false) || isUserBanned) {
+                          if (isUserBanned) {
+                            showSnackbar();
+                          }
+                          return null;
+                        } else {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return CheckoutScreen();
+                          }));
+                        }
                       },
                       style: ButtonStyle(
                         backgroundColor:

@@ -155,6 +155,20 @@ Future<Widget> whereToGo() async {
   if (isVendor == true) {
     return vendorMainScreen();
   } else if (loginValue) {
+    // Check if the user is banned
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('buyers')
+          .doc(user.uid)
+          .get();
+      bool isBanned = userDoc['ban'] ?? false;
+      if (isBanned) {
+        // If user is banned, set loginValue to false and return LoginScreen
+        sharedPref.setBool('login', false);
+        return LoginScreen();
+      }
+    }
     return MainScreen();
   }
   return LoginScreen();

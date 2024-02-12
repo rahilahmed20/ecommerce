@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Get.offAll(MainScreen());
 
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Logged in as a buyer')));
+              .showSnackBar(SnackBar(content: Text('Logged In Successfully')));
         } else {
           // Handle unexpected role or show an error message
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(

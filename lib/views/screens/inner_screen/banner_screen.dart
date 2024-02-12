@@ -73,7 +73,7 @@ class BannerScreen extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: CircularProgressIndicator(
-                color: Colors.yellow.shade900,
+                color: Color(0xFF3C55EF),
               ),
             );
           }

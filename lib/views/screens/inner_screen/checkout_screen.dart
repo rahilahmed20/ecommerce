@@ -699,7 +699,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         'quantity': item.quantity,
         'productCategory': item.categoryName,
         'productImage': item.imageUrl[0],
-        'price': item.productPrice
+        'price': item.discount
       });
     }
 

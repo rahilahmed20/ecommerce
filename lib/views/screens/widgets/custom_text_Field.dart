@@ -54,8 +54,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             prefixIcon: Padding(
                 padding: EdgeInsets.all(10.0), child: widget.prefixIcon),
-            // contentPadding:
-            //     EdgeInsets.fromLTRB(20 * fem, 18 * fem, 25.58 * fem, 18 * fem),
             hintStyle: TextStyle(color: Color(0xffbcbcbc)),
             suffixIcon: widget.isPassword
                 ? IconButton(

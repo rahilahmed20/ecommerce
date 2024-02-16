@@ -327,7 +327,7 @@
     },
     {
       "name": "image",
-      "rootUri": "file:///C:/Users/admin/AppData/Local/Pub/Cache/hosted/pub.dev/image-4.1.6",
+      "rootUri": "file:///C:/Users/admin/AppData/Local/Pub/Cache/hosted/pub.dev/image-4.1.7",
       "packageUri": "lib/",
       "languageVersion": "2.15"
     },
@@ -381,9 +381,9 @@
     },
     {
       "name": "intl",
-      "rootUri": "file:///C:/Users/admin/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.18.1",
+      "rootUri": "file:///C:/Users/admin/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.19.0",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.0"
     },
     {
       "name": "js",
@@ -405,7 +405,7 @@
     },
     {
       "name": "mailer",
-      "rootUri": "file:///C:/Users/admin/AppData/Local/Pub/Cache/hosted/pub.dev/mailer-6.0.1",
+      "rootUri": "file:///C:/Users/admin/AppData/Local/Pub/Cache/hosted/pub.dev/mailer-6.1.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -675,7 +675,7 @@
     },
     {
       "name": "url_launcher_android",
-      "rootUri": "file:///C:/Users/admin/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_android-6.2.2",
+      "rootUri": "file:///C:/Users/admin/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_android-6.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -758,7 +758,7 @@
       "languageVersion": "3.1"
     }
   ],
-  "generated": "2024-02-08T11:41:05.975363Z",
+  "generated": "2024-02-15T05:44:11.482308Z",
   "generator": "pub",
   "generatorVersion": "3.2.6"
 }

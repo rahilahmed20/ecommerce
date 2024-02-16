@@ -7,10 +7,8 @@ import 'package:macstore/controllers/cart_controller.dart';
 import 'package:macstore/controllers/favourite_controller.dart';
 import 'package:macstore/provider/favorite_provider.dart';
 import 'package:macstore/provider/product_provider.dart';
-import 'package:macstore/provider/size_provider.dart';
 import 'package:macstore/views/screens/widgets/curved_edges.dart';
 import 'package:macstore/views/screens/widgets/product_models.dart';
-import 'package:custom_rating_bar/custom_rating_bar.dart' as rate;
 
 class ProductDetail extends ConsumerStatefulWidget {
   final dynamic productData;
@@ -49,7 +47,6 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
     final cartItem = ref.watch(cartProvider);
     final isInCart = cartItem.containsKey(widget.productData['productId']);
 
-    final selectedSize = ref.watch(selectedSizeProvider);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -199,7 +196,6 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                         widget.productData['productName'],
                         style: GoogleFonts.getFont(
                           'Lato',
-                          // color: const Color(0xFF3C55EF),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.7,
@@ -386,7 +382,6 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                         'Status: ',
                         style: GoogleFonts.getFont(
                           'Lato',
-                          // color: const Color(0xFF9A9998),
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1,
@@ -421,78 +416,36 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                     ],
                   ),
 
-                  // Attributes
-                  SizedBox(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        widget.productData['productSize'].isEmpty
-                            ? Text('')
-                            : Container(
-                                height: 30,
-                                alignment: const Alignment(0, -0.2),
-                                child: Text(
-                                  'Size :',
-                                  style: GoogleFonts.getFont(
-                                    'Lato',
-                                    color: const Color(0xFF343434),
-                                    fontSize: 16,
-                                    height: 1.6,
+                  // Weight
+                  widget.productData['productSize'].isEmpty
+                      ? SizedBox()
+                      : Column(
+                          children: [
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.black87,
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  child: Text(
+                                    widget.productData['productSize'][0],
+                                    style: GoogleFonts.quicksand(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                 ),
                               ),
-                        Container(
-                          height: 50,
-                          child: ListView.builder(
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemCount:
-                                  widget.productData['productSize'].length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: InkWell(
-                                    onTap: () {
-                                      final newSelected = widget
-                                          .productData['productSize'][index];
-
-                                      ref
-                                          .read(selectedSizeProvider.notifier)
-                                          .setSelectedSize(newSelected);
-                                    },
-                                    child: Container(
-                                      clipBehavior: Clip.hardEdge,
-                                      decoration: BoxDecoration(
-                                        color: selectedSize ==
-                                                widget.productData[
-                                                    'productSize'][index]
-                                            ? Colors.black.withOpacity(0.35)
-                                            : Colors.black,
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          widget.productData['productSize']
-                                              [index],
-                                          style: GoogleFonts.quicksand(
-                                            color: selectedSize ==
-                                                    widget.productData[
-                                                        'productSize'][index]
-                                                ? Colors.black
-                                                : Color(0xFFF6F6F7),
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
 
                   SizedBox(
                     height: 20,
@@ -629,7 +582,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                         quantity: qty,
                         size: (widget.productData['productSize'].isEmpty)
                             ? ''
-                            : selectedSize,
+                            : widget.productData['productSize'][0],
                       );
 
                       _cartProvider.addProductToCart(
@@ -641,7 +594,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                         productId: widget.productData['productId'],
                         productSize: (widget.productData['productSize'].isEmpty)
                             ? ''
-                            : selectedSize,
+                            : widget.productData['productSize'][0],
                         discount: widget.productData['discountPrice'],
                         description: widget.productData['description'],
                         totalQuantity: widget.productData['quantity'],

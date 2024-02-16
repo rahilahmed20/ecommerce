@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 class CategoryWidget extends StatelessWidget {
   const CategoryWidget({super.key});
 

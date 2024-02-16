@@ -213,15 +213,14 @@ class _OrderDetailState extends State<OrderDetail> {
                               alignment: Alignment.centerLeft,
                               child: item['size'] != '' && item['size'] != null
                                   ? Text(
-                                      'Size: ${item['size']}',
-                                      style: GoogleFonts.getFont(
-                                        'Lato',
-                                        color: const Color(0xFF7F808C),
-                                        fontSize: 12,
-                                        height: 1.6,
-                                      ),
+                                      '${item['size']}',
+                                      style: GoogleFonts.getFont('Lato',
+                                          color: const Color(0xFF7F808C),
+                                          fontSize: 12,
+                                          height: 1.6,
+                                          fontWeight: FontWeight.bold),
                                     )
-                                  : SizedBox(), // Use SizedBox() to create an empty space when size is not available
+                                  : SizedBox(),
                             ),
 
                             // Price

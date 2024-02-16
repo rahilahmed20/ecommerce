@@ -39,12 +39,10 @@ void sendOrderNotification(
 String getCancelledOrderHTML(
     List<dynamic> items, DocumentSnapshot orderSnapshot) {
   String productList = items.map((product) {
-    print('Product');
-    print(orderSnapshot['mode']);
     // Check if the product has a size
     String sizeInfo = '';
     if (product['size'] != null && product['size'].isNotEmpty) {
-      sizeInfo = '<li><strong>Size:</strong> ${product['size']}</li>';
+      sizeInfo = '<li><strong>Weight:</strong> ${product['size']}</li>';
     }
 
     return '''
@@ -105,7 +103,7 @@ String getConfirmedOrderHTML(
     // Check if the product has a size
     String sizeInfo = '';
     if (product['size'] != null && product['size'].isNotEmpty) {
-      sizeInfo = '<li><strong>Size:</strong> ${product['size']}</li>';
+      sizeInfo = '<li><strong>Weight:</strong> ${product['size']}</li>';
     }
 
     return '''

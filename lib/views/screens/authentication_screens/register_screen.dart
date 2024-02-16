@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/controllers/auth_controller.dart';
-import 'package:macstore/vendor/authentication/vendor_login_Screen.dart';
 import 'package:macstore/views/screens/authentication_screens/login_screen.dart';
 import 'package:macstore/views/screens/widgets/button_widget.dart';
 import 'package:macstore/views/screens/widgets/custom_text_Field.dart';
@@ -275,31 +274,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Login vendor account?',
-                          style: GoogleFonts.roboto(
-                            fontSize: 14,
-                            letterSpacing: 0.1,
-                            height: 1.7,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return VendorLoginScreen();
-                            }));
-                          },
-                          child: Text(
-                            'Login',
-                            style: GoogleFonts.roboto(),
-                          ),
-                        ),
-                      ],
-                    )
                   ],
                 ),
               ),

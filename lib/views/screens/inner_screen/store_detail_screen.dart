@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/views/screens/widgets/popularProduct_models.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StoreDetailScreen extends StatelessWidget {

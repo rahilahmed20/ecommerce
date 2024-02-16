@@ -223,35 +223,6 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  // Align(
-                  //   alignment: Alignment.topLeft,
-                  //   child: Padding(
-                  //     padding: const EdgeInsets.only(bottom: 5.0, left: 8.0),
-                  //     child: Text(
-                  //       'Contact No',
-                  //       style: GoogleFonts.getFont(
-                  //         'Nunito Sans',
-                  //         fontWeight: FontWeight.w600,
-                  //         letterSpacing: 0.2,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  // CustomTextField(
-                  //   label: 'pls add contact no',
-                  //   prefixIcon: Icon(null),
-                  //   text: 'pls provide contact no ',
-                  //   validator: (value) {
-                  //     if (value!.isEmpty) {
-                  //       return "Enter Contact no";
-                  //     } else {
-                  //       return null;
-                  //     }
-                  //   },
-                  //   onChanged: (value) {
-                  //     contactNo = value;
-                  //   },
-                  // ),
                   ButtonWidgets(
                     isLoading: false,
                     buttonChange: () async {

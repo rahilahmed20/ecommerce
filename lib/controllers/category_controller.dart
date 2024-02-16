@@ -30,12 +30,8 @@ class CategoryController extends GetxController {
 
       // Shuffle the categories
       categories.shuffle();
-
-      // Now, you have shuffled categories in the 'categories' list.
     }, onError: (error) {
-      // Handle errors during stream subscription
       print("Error fetching categories: $error");
-      // You can add additional error handling logic or show a message to the user
     });
   }
 }

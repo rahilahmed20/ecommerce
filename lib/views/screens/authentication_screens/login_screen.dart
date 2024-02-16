@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/controllers/auth_controller.dart';
-import 'package:macstore/vendor/authentication/vendor_register_screen.dart';
 import 'package:macstore/views/screens/authentication_screens/forget_password_screen.dart';
-import 'package:macstore/views/screens/authentication_screens/login_with_otp.dart';
 import 'package:macstore/views/screens/authentication_screens/register_screen.dart';
 import 'package:macstore/views/screens/main_screen.dart';
 import 'package:macstore/views/screens/widgets/button_widget.dart';
 import 'package:macstore/views/screens/widgets/custom_text_Field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:macstore/vendor/authentication/vendor_login_Screen.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -239,49 +236,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Create Vendor account?',
-                          style: GoogleFonts.roboto(),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Get.to(VendorRegisterScreen());
-                          },
-                          child: Text(
-                            'Create account?',
-                            style: GoogleFonts.roboto(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Login with Email and OTP?',
-                          style: GoogleFonts.roboto(
-                            fontSize: 14,
-                            letterSpacing: 0.1,
-                            height: 1.7,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return LoginScreenOTP();
-                            }));
-                          },
-                          child: Text(
-                            'Login',
-                            style: GoogleFonts.roboto(),
-                          ),
-                        ),
-                      ],
-                    )
                   ],
                 ),
               ),

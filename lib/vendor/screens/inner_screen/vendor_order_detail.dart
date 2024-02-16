@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class VendorOrderDetail extends StatefulWidget {
   final dynamic orderData;
@@ -15,8 +13,6 @@ class VendorOrderDetail extends StatefulWidget {
 
 class _VendorOrderDetailState extends State<VendorOrderDetail> {
   double rating = 0;
-
-  final TextEditingController _reviewTextController = TextEditingController();
 
   Future<void> markAsDelivered() async {
     try {
@@ -154,7 +150,7 @@ class _VendorOrderDetailState extends State<VendorOrderDetail> {
                                           Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              'Size: ${widget.orderData['size']}',
+                                              'Weight: ${widget.orderData['size']}',
                                               style: GoogleFonts.getFont(
                                                 'Lato',
                                                 color: const Color(0xFF7F808C),

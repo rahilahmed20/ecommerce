@@ -59,7 +59,6 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
                             badgeContent: Text(
                               _wishItem.length.toString(),
                               style: GoogleFonts.lato(
-                                // fontSize: 11,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -318,11 +317,12 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
                                           height: 2,
                                         ),
                                         Text(
-                                          'Size: ${wishData.productSize}',
+                                          '${wishData.productSize[0]}',
                                           style: GoogleFonts.getFont(
                                             'Lato',
                                             color: const Color(0xFF7F808C),
                                             fontSize: 12,
+                                            fontWeight: FontWeight.bold,
                                             height: 1.6,
                                           ),
                                         ),

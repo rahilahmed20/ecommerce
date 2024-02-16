@@ -37,10 +37,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
         backgroundColor: Colors.red,
       ));
     } catch (e) {
-      // Handle other errors
       print('Error: $e');
     } finally {
-      // Reset loading state
       setState(() {
         _isLoading = false;
       });

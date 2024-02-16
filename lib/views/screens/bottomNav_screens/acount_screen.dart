@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
@@ -18,7 +17,6 @@ import 'package:macstore/views/screens/inner_screen/order_screen.dart';
 import 'package:macstore/views/screens/inner_screen/shipping_address_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../vendor/authentication/logout_confirmation_modal.dart';
 
 class EditProfilePopup extends StatefulWidget {
@@ -210,21 +208,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   @override
   void initState() {
     super.initState();
-    // Call the method to set up the stream
     _setupUserDataStream();
     _setupOrdersDataStream();
-    // _fetchTotalOrders(); // Call the method to fetch total orders
   }
-
-  // void _fetchTotalOrders() async {
-  //   // Fetch total orders from Firestore
-  //   QuerySnapshot ordersSnapshot = await _firestore.collection('orders').get();
-
-  //   // Update the totalOrders variable with the count of documents
-  //   setState(() {
-  //     totalOrders = ordersSnapshot.size;
-  //   });
-  // }
 
   void _setupUserDataStream() {
     // Create a stream of the user data

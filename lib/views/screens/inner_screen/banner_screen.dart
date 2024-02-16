@@ -101,7 +101,6 @@ class BannerScreen extends StatelessWidget {
               mainAxisSpacing: 15,
               crossAxisSpacing: 15,
               childAspectRatio: 1 / 1.5,
-              // Adjusted aspect ratio
               children: List.generate(products.length, (index) {
                 final product = products[index];
                 return ProductModel(productData: product);

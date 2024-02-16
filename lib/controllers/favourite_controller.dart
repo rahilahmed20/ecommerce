@@ -11,7 +11,6 @@ class FavouriteController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Initialize favouriteProductIds when the controller is initialized
     updateFavourites();
   }
 

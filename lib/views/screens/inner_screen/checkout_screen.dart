@@ -10,7 +10,6 @@ import 'package:macstore/provider/product_provider.dart';
 import 'package:macstore/views/screens/inner_screen/shipping_address_screen.dart';
 import 'package:uuid/uuid.dart';
 import 'package:macstore/utilities/send_mail.dart';
-import 'package:intl/intl.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   @override
@@ -623,8 +622,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             } catch (error) {
               print('Error saving orders: $error');
             } finally {
-              // Set loading back to false after processing
-
               setState(() {
                 _isLoading = false;
               });
@@ -662,9 +659,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   Future<bool> saveOrderDetails() async {
     DateTime now = DateTime.now();
-    // String formattedTimestamp = DateFormat('dd-MM-yyyy hh:mm a').format(now);
-    String formattedTimestamp =
-        DateFormat('dd MMMM yyyy ' 'at' ' hh:mm:ss a z').format(now);
 
     final _cartProvider = ref.read(cartProvider.notifier);
 
@@ -721,7 +715,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         "delivered": false,
         "processing": true,
         "mode": selectedPaymentOption,
-        'timestamp': formattedTimestamp,
+        'timestamp': now,
       });
       return true;
     } catch (error) {

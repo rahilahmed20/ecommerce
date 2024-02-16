@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:macstore/views/screens/widgets/button_widget.dart';
 import 'package:uuid/uuid.dart';
@@ -31,7 +29,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final List<String> _categoryList = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late String prouctName;
+  late String productName;
   late double price;
   late double discountPrice;
   late String description;
@@ -44,8 +42,6 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
   final String apiKey = 'mLq1RQ3tbsna8my9oZG9vkNj';
   FilePickerResult? result;
 
-  // upload image
-  // upload image
   // upload image
   uploadImage() async {
     for (var selectedImage in images) {
@@ -80,7 +76,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
         'productId': productId,
         'category': _selectedCategory,
         'productSize': _sizeList,
-        'productName': prouctName,
+        'productName': productName,
         'price': price.toDouble(),
         'discountPrice': discountPrice.toDouble(),
         'description': description,
@@ -265,7 +261,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                     'Product Name',
                     TextInputType.text,
                     (value) {
-                      prouctName = value;
+                      productName = value;
                     },
                     (value) {
                       if (value!.isEmpty) {
@@ -456,7 +452,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
                               )
                             : Image.memory(
                                 images[index - 1],
-                                fit: BoxFit.cover,
+                                fit: BoxFit.contain,
                               );
                       }),
                     ),

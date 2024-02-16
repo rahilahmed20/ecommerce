@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/views/screens/authentication_screens/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../views/screens/splash_screen.dart';
 import '../authentication/logout_confirmation_modal.dart';
 import '../authentication/vendor_login_Screen.dart';
 
@@ -198,33 +196,6 @@ class _VendorAccountScreenState extends State<VendorAccountScreen> {
                             ],
                           ),
                         ),
-                        // InkWell(
-                        //   onTap: () {
-                        //     Navigator.push(context,
-                        //         MaterialPageRoute(builder: (context) {
-                        //       return WithdrawalScreen();
-                        //     }));
-                        //   },
-                        //   child: Container(
-                        //     height: 40,
-                        //     width: MediaQuery.of(context).size.width - 40,
-                        //     decoration: BoxDecoration(
-                        //       color: Colors.yellow.shade900,
-                        //       borderRadius: BorderRadius.circular(10),
-                        //     ),
-                        //     child: Center(
-                        //       child: Text(
-                        //         'WithDraw',
-                        //         style: TextStyle(
-                        //           color: Colors.white,
-                        //           fontSize: 18,
-                        //           fontWeight: FontWeight.bold,
-                        //           letterSpacing: 6,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ));

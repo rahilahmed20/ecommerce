@@ -45,20 +45,6 @@ class VendorOrderScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Positioned(
-                //   left: 23,
-                //   top: 54,
-                //   child: InkWell(
-                //     onTap: () {
-                //       Navigator.pop(context);
-                //     },
-                //     child: Icon(
-                //       Icons.arrow_back_ios,
-                //       size: 20,
-                //       color: Colors.white,
-                //     ),
-                //   ),
-                // )
               ],
             ),
           ),

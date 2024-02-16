@@ -237,10 +237,10 @@ class _CartScreenProductState extends ConsumerState<CartScreenProduct> {
                                           ),
                                         ),
 
-                                        // Size
+                                        // Weight
                                         if (cartItem.productSize != '')
                                           Text(
-                                            'Size: ' + cartItem.productSize,
+                                            cartItem.productSize,
                                             style: TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w500),

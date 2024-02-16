@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:macstore/views/screens/inner_screen/order_detail_screen.dart';
-
 import '../../../utilities/send_mail.dart';
 
 class OrderScreen extends StatelessWidget {
@@ -217,14 +216,15 @@ class OrderScreen extends StatelessWidget {
                                               visible: item['size'] != null &&
                                                   item['size'].isNotEmpty,
                                               child: Text(
-                                                'Size: ${item['size']}',
+                                                '${item['size']}',
                                                 style: GoogleFonts.getFont(
-                                                  'Lato',
-                                                  color:
-                                                      const Color(0xFF7F808C),
-                                                  fontSize: 12,
-                                                  height: 1.6,
-                                                ),
+                                                    'Lato',
+                                                    color:
+                                                        const Color(0xFF7F808C),
+                                                    fontSize: 12,
+                                                    height: 1.6,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
                                             ),
                                           ),

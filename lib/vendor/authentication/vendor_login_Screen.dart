@@ -9,7 +9,6 @@ import 'package:macstore/views/screens/widgets/button_widget.dart';
 import 'package:macstore/views/screens/widgets/custom_text_Field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../views/screens/authentication_screens/forget_password_screen.dart';
-import '../../views/screens/splash_screen.dart';
 
 class VendorLoginScreen extends StatefulWidget {
   VendorLoginScreen({super.key});

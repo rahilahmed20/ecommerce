@@ -39,10 +39,10 @@ dependencies:
   image_picker: ^1.0.4
   get: ^4.6.6
   flutter_riverpod: ^2.4.6
-  firebase_core: ^2.22.0
-  firebase_auth: ^4.14.0
+  firebase_core: ^2.25.4
+  firebase_auth: ^4.17.4
   cloud_firestore: ^4.15.4
-  firebase_storage: ^11.5.0
+  firebase_storage: ^11.6.5
   cached_network_image: ^3.3.0
   badges: ^3.1.2
   uuid: ^4.2.1

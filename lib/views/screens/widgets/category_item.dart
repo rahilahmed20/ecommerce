@@ -14,19 +14,27 @@ class CategoryItem extends StatelessWidget {
 
     return Obx(
       () {
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+        return Container(
+          height: 250,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
                 height: 20,
               ),
-              Row(
-                children: List.generate(
-                  categoryController.categories.length > 8
+              Expanded(
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    crossAxisSpacing: 2.0,
+                    mainAxisSpacing: 10.0,
+                  ),
+                  itemCount: categoryController.categories.length > 8
                       ? 8
                       : categoryController.categories.length,
-                  (index) {
+                  itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () {
                         Navigator.push(
@@ -41,28 +49,26 @@ class CategoryItem extends StatelessWidget {
                           ),
                         );
                       },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 8.0),
-                        width: 83,
-                        height: 110,
-                        clipBehavior: Clip.antiAlias,
-                        decoration: const BoxDecoration(),
-                        child: Column(
-                          children: [
-                            Image.network(
+                      child: Column(
+                        children: [
+                          Expanded(
+                            flex: 6,
+                            child: Image.network(
                               categoryController
                                   .categories[index].categoryImage,
-                              width: 57,
-                              height: 57,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.contain,
                             ),
-                            SizedBox(
-                              width: 83,
-                              height: 40,
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
                               child: Text(
                                 categoryController
                                     .categories[index].categoryName,
                                 maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.quicksand(
                                   color: Colors.black,
@@ -72,8 +78,8 @@ class CategoryItem extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     );
                   },
